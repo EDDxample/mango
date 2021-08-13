@@ -58,89 +58,94 @@ CONCEPTOS:
 import (
 	"bufio"
 	"fmt"
-	"mango/src/log"
+	"mango/src/network"
 	"net"
-	"os"
 )
 
 const (
 	host     = "localhost"
-	port     = "8080"
+	port     = "25565"
 	protocol = "tcp"
 )
 
 func main() {
-	if len(os.Args) != 2 {
-		log.LOGGER.PrintError("Usage: go run . <client|server>")
-	} else if os.Args[1] == "client" {
-		clientConnect()
-	} else if os.Args[1] == "server" {
-		serverLoop()
-	}
-}
-
-func clientConnect() {
-	connection, err := net.Dial(protocol, host+":"+port)
-
-	if err != nil {
-		log.LOGGER.PrintError("Error connecting" + err.Error())
-		os.Exit(1)
-	}
-
-	reader := bufio.NewReader(os.Stdin)
-
-	for {
-		fmt.Print("Text to send: ")
-
-		input, _ := reader.ReadString('\n')
-
-		connection.Write([]byte(input))
-
-		message, _ := bufio.NewReader(connection).ReadString('\n')
-		if message != "" {
-			log.LOGGER.Print("Server relay: " + message)
-		}
-
-	}
-}
-
-func serverLoop() {
-	log.LOGGER.PushContext("main")
-	defer log.LOGGER.PopContext()
-
-	log.LOGGER.Print("Starting " + protocol + " server on " + host + ":" + port + "...")
-
-	socket, err := net.Listen(protocol, host+":"+port)
+	// serverLoop()
+	fmt.Println("running...")
+	fmt.Println()
+	socket, _ := net.Listen("tcp", "localhost:25565")
 	defer socket.Close()
 
-	if err != nil {
-		log.LOGGER.PrintError("Error listening: " + err.Error())
-	}
-
 	for {
-		connection, err := socket.Accept()
+		connection, _ := socket.Accept()
+		fmt.Println("New connection", connection.RemoteAddr().String())
+		fmt.Println()
 
-		if err != nil {
-			log.LOGGER.PrintError("Error connecting: " + err.Error())
-			return
+		bufferReader := bufio.NewReader(connection)
+
+		state := ProcessHandShakePacket(bufferReader)
+
+		switch state {
+		case 1:
+			SendStatusPacket(connection, bufferReader)
+			break
+		case 2:
+			Login()
+			break
+
 		}
-
-		log.LOGGER.Print("Client " + connection.RemoteAddr().String() + " connected.")
-
-		go handleConnection(connection)
 	}
 }
 
-func handleConnection(connection net.Conn) {
-	buffer, err := bufio.NewReader(connection).ReadBytes('\n')
+func ProcessHandShakePacket(bufferReader *bufio.Reader) int32 {
+	println("HandShake Packet")
+	// packet header
+	packetLength := network.ReadVarInt(bufferReader)
+	println("- Packet Length:", packetLength)
+	packetID := network.ReadVarInt(bufferReader)
+	println("- Packet ID:", packetID)
+	// packet data
+	protocolVersion := network.ReadVarInt(bufferReader)
+	println("  - Protocol Version:", protocolVersion)
+	serverAddress := network.ReadString(bufferReader, 255)
+	println("  - Server Address:", serverAddress)
+	serverPort := network.ReadUShort(bufferReader)
+	println("  - Server Port:", serverPort)
+	nextState := network.ReadVarInt(bufferReader)
+	println("  - NextState:", nextState)
+	println()
+	return nextState
+}
 
-	if err != nil {
-		log.LOGGER.Print("Client " + connection.RemoteAddr().String() + " left.")
-		connection.Close()
-		return
-	}
+func SendStatusPacket(connection net.Conn, bufferReader *bufio.Reader) {
+	println("Request Packet")
+	// request packet
+	packetLength := network.ReadVarInt(bufferReader)
+	println("- Packet Length:", packetLength)
+	packetID := network.ReadVarInt(bufferReader)
+	println("- Packet ID:", packetID)
+	println()
 
-	log.LOGGER.Print("Client message: " + string(buffer[:len(buffer)-1]))
-	connection.Write(buffer)
-	handleConnection(connection)
+	statusPayload := []byte(`{
+		"description": { "text": "Powered by man.go! \\o/" },
+		"version": { "name": "1.16.5", "protocol": 754 },
+		"players": { "max": 5, "online": -69 }
+	}`)
+
+	stringLength := len(statusPayload)
+	bufferedStringLength := network.WriteVarInt(int32(stringLength))
+	statusPacketLength := 1 + int32(len(bufferedStringLength)) + int32(stringLength)
+	bufferedStatusPacketLength := network.WriteVarInt(statusPacketLength)
+	statusPacketID := byte(0)
+
+	var packet []byte
+	packet = append(packet, bufferedStatusPacketLength...)
+	packet = append(packet, statusPacketID)
+	packet = append(packet, bufferedStringLength...)
+	packet = append(packet, statusPayload...)
+
+	connection.Write(packet)
+
+}
+
+func Login() {
 }
