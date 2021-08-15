@@ -33,6 +33,8 @@ func HandleConnection(connection net.Conn) {
 	case STATUS:
 		packet.ReadC2SRequest(&bufferedPacket)
 		packet.WriteS2CStatus(connection)
+		timestamp := packet.ReadC2SPing(&bufferedPacket)
+		packet.WriteS2CPong(connection, timestamp)
 		connection.Close()
 	case LOGIN:
 

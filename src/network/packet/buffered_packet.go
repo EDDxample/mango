@@ -46,6 +46,12 @@ func (bufferedPacket *BufferedPacket) ReadInt() int32 {
 	return value
 }
 
+func (bufferedPacket *BufferedPacket) ReadLong() int64 {
+	var value int64
+	binary.Read(bufferedPacket.Reader, binary.BigEndian, &value)
+	return value
+}
+
 func (bufferedPacket *BufferedPacket) ReadString(maxLength int32) string {
 	length := bufferedPacket.ReadVarInt()
 	if length > maxLength*4 {
@@ -66,8 +72,14 @@ func (bufferedPacket *BufferedPacket) WriteBytes(data []byte) {
 	bufferedPacket.buffer = append(bufferedPacket.buffer, data...)
 }
 
+func (bufferedPacket *BufferedPacket) WriteLong(value int64) {
+	buffer := make([]byte, 8)
+	binary.BigEndian.PutUint64(buffer, uint64(value))
+	bufferedPacket.WriteBytes(buffer)
+}
+
 func (bufferedPacket *BufferedPacket) WriteVarInt(value int32) {
-	bufferedPacket.buffer = append(bufferedPacket.buffer, getVarInt(value)...)
+	bufferedPacket.WriteBytes(getVarInt(value))
 }
 
 func (bufferedPacket *BufferedPacket) WriteString(text string) {
