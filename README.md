@@ -6,6 +6,8 @@ Minecraft Advanced Network in go (Minecraft Server)
 
 ## TODO
 - Learn how to actually structure a go project
+- Login protocol
+- Implement error handling
 
 ## Resources
 
