@@ -36,8 +36,30 @@ func HandleConnection(connection net.Conn) {
 		timestamp := packet.ReadC2SPing(&bufferedPacket)
 		packet.WriteS2CPong(connection, timestamp)
 		connection.Close()
+		break
 	case LOGIN:
+		premiumServer := false
+		uuid := ""
 
-	case GAME:
+		username := packet.ReadC2SLoginStart(&bufferedPacket)
+
+		if premiumServer {
+			// Client auth
+			//   C→S: Encryption Response
+			// Server auth, both enable encryption
+			//   S→C: Set Compression (optional)
+		} else {
+			uuid = getUUID(username)
+		}
+
+		packet.WriteS2CLoginSuccess(connection, username, uuid)
+		nextState = PLAY
+		break
+	case PLAY:
 	}
+}
+
+func getUUID(userName string) string {
+	// idk
+	return "396367fa-b5d1-3a3f-b390-ea07a86c3112"
 }

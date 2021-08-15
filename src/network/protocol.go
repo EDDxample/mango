@@ -1,7 +1,7 @@
 package network
 
 const (
-	GAME      = -1
+	PLAY      = -1
 	HANDSHAKE = 0
 	STATUS    = 1
 	LOGIN     = 2
