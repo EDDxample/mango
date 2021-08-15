@@ -5,8 +5,9 @@ Minecraft Advanced Network in go (Minecraft Server)
 `$ go run ./src/main/man.go`
 
 ## TODO
+- Login protocol ✔️
+- Join game protocol
 - Learn how to actually structure a go project
-- Login protocol
 - Implement error handling
 
 ## Resources
