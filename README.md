@@ -1,7 +1,8 @@
 # mango
-Minecraft server (Minecraft Advanced Network? idk) in go
+Minecraft Advanced Network in go (Minecraft Server) 
 
 
-`$ go run ./src/main/man.go <client|server>`
+`$ go run ./src/main/man.go`
 
-(Still learning go's best practices)
+### TODO
+- Learn how to actually structure a go project
