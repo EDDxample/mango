@@ -27,21 +27,21 @@ func HandleConnection(connection net.Conn) {
 
 	bufferedPacket := packet.BufferedPacket{Reader: bufio.NewReader(connection)}
 
-	nextState := packet.ReadC2SHandshake(&bufferedPacket)
+	handshakePacket := bufferedPacket.ReadPacket(packet.C2SHandshake{}).(packet.C2SHandshake)
 
-	switch nextState {
+	switch handshakePacket.NextState {
 	case STATUS:
-		packet.ReadC2SRequest(&bufferedPacket)
+		_ = bufferedPacket.ReadPacket(packet.C2SRequest{}) // no need for casting if you're not using it
 		packet.WriteS2CStatus(connection)
-		timestamp := packet.ReadC2SPing(&bufferedPacket)
-		packet.WriteS2CPong(connection, timestamp)
+		pingPacket := bufferedPacket.ReadPacket(packet.C2SPing{}).(packet.C2SPing)
+		packet.WriteS2CPong(connection, pingPacket.Timestamp)
 		connection.Close()
-		break
+
 	case LOGIN:
 		premiumServer := false
 		uuid := ""
 
-		username := packet.ReadC2SLoginStart(&bufferedPacket)
+		loginPacket := bufferedPacket.ReadPacket(packet.C2SLoginStart{}).(packet.C2SLoginStart)
 
 		if premiumServer {
 			// Client auth
@@ -49,12 +49,12 @@ func HandleConnection(connection net.Conn) {
 			// Server auth, both enable encryption
 			//   S→C: Set Compression (optional)
 		} else {
-			uuid = getUUID(username)
+			uuid = getUUID(loginPacket.Username)
 		}
 
-		packet.WriteS2CLoginSuccess(connection, username, uuid)
-		nextState = PLAY
-		break
+		packet.WriteS2CLoginSuccess(connection, loginPacket.Username, uuid)
+		handshakePacket.NextState = PLAY
+
 	case PLAY:
 	}
 }
