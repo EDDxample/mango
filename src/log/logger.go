@@ -4,14 +4,16 @@ import "fmt"
 
 var LOGGER = loggerClass{contextStack: []string{"start"}}
 
-var colorReset string = "\033[0m"
-var colorRed string = "\033[31m"
-var colorGreen string = "\033[32m"
-var colorYellow string = "\033[33m"
-var colorBlue string = "\033[34m"
-var colorPurple string = "\033[35m"
-var colorCyan string = "\033[36m"
-var colorWhite string = "\033[37m"
+const (
+	colorReset  = "\033[0m"
+	colorRed    = "\033[31m"
+	colorGreen  = "\033[32m"
+	colorYellow = "\033[33m"
+	colorBlue   = "\033[34m"
+	colorPurple = "\033[35m"
+	colorCyan   = "\033[36m"
+	colorWhite  = "\033[37m"
+)
 
 type loggerClass struct {
 	contextStack []string
