@@ -1,8 +1,8 @@
 package network
 
 const (
-	PLAY      = -1
-	HANDSHAKE = 0
-	STATUS    = 1
-	LOGIN     = 2
+	PLAY int32 = iota - 1
+	HANDSHAKE
+	STATUS
+	LOGIN
 )

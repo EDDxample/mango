@@ -2,7 +2,7 @@
 Minecraft Advanced Network in go (Minecraft Server) 
 
 
-`$ go run ./src/main/man.go`
+`$ go run .`
 
 ## TODO
 - Login protocol ✔️

@@ -2,8 +2,11 @@ package network
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
+	"log"
 	"net"
+	"net/http"
 
 	"mango/src/network/packet"
 )
@@ -12,18 +15,26 @@ import (
 // handle handshake async
 // if nextstate != status, add connection to array
 
-func Init(address string, port string) {
-	socket, _ := net.Listen("tcp", address+":"+port)
+func Run(address, port, protocol string) {
+	socket, err := net.Listen(protocol, address+":"+port)
+	if err != nil {
+		log.Fatalf("Error while opening the connection socket, %s", err)
+	}
 	defer socket.Close()
 
 	for {
-		connection, _ := socket.Accept()
-		go HandleConnection(connection)
+		connection, err := socket.Accept()
+		if err != nil {
+			log.Printf("Couldn't accept an incoming socket, %s\n", err)
+		} else {
+			go HandleConnection(connection)
+		}
 	}
 }
 
 func HandleConnection(connection net.Conn) {
-	fmt.Println("\nNew connection", connection.RemoteAddr().String(), "---------")
+	var err error
+	fmt.Printf("\nNew connection %s---------\n", connection.RemoteAddr())
 
 	bufferedPacket := packet.BufferedPacket{Reader: bufio.NewReader(connection)}
 
@@ -31,7 +42,7 @@ func HandleConnection(connection net.Conn) {
 
 	switch handshakePacket.NextState {
 	case STATUS:
-		_ = bufferedPacket.ReadPacket(packet.C2SRequest{}) // no need for casting if you're not using it
+		bufferedPacket.ReadPacket(packet.C2SRequest{}) // no need for casting if you're not using it
 		packet.WriteS2CStatus(connection)
 		pingPacket := bufferedPacket.ReadPacket(packet.C2SPing{}).(packet.C2SPing)
 		packet.WriteS2CPong(connection, pingPacket.Timestamp)
@@ -49,7 +60,12 @@ func HandleConnection(connection net.Conn) {
 			// Server auth, both enable encryption
 			//   S→C: Set Compression (optional)
 		} else {
-			uuid = getUUID(loginPacket.Username)
+			uuid, err = getUUID(loginPacket.Username)
+			if err != nil {
+				log.Printf("Couldn't find UUID for username %s, %s\n", loginPacket.Username, err)
+				connection.Close()
+				return
+			}
 		}
 
 		packet.WriteS2CLoginSuccess(connection, loginPacket.Username, uuid)
@@ -59,7 +75,23 @@ func HandleConnection(connection net.Conn) {
 	}
 }
 
-func getUUID(userName string) string {
-	// idk
-	return "396367fa-b5d1-3a3f-b390-ea07a86c3112"
+type UserUUID struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+}
+
+func getUUID(userName string) (string, error) {
+	res, err := http.Get(fmt.Sprintf("https://api.mojang.com/users/profiles/minecraft/%s", userName))
+	if err != nil {
+		return "", err
+	}
+
+	var userUuid UserUUID
+	err = json.NewDecoder(res.Body).Decode(&userUuid)
+	if err != nil {
+		return "", err
+	}
+	log.Printf("Username %s corresponds to id %s and user %s", userName, userUuid.Id, userUuid.Name)
+
+	return userUuid.Id, nil
 }
