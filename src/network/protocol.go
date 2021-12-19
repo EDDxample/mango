@@ -9,16 +9,16 @@ const (
 
 func Handshake(conn net.Conn) {
 	var handshake c2s.Handshake
-	handshake.ReadPacket(conn)
+	handshake.ReadFrom(conn)
 	fmt.Println(handshake)
 
 	var request c2s.Request
-	request.ReadPacket(conn)
+	request.ReadFrom(conn)
 	fmt.Println(request)
 
 	// S2C_response
 
 	var ping c2s.Ping
-	ping.ReadPacket(conn)
+	ping.ReadFrom(conn)
 	fmt.Println(ping)
 }
