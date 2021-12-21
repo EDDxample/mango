@@ -2,16 +2,10 @@ package main
 
 import (
 	"log"
-	"mango/src/network"
-)
-
-const (
-	HOST     = "localhost"
-	PORT     = "25565"
-	PROTOCOL = "tcp"
+	"mango/src"
 )
 
 func main() {
-	log.Println("Running...")
-	network.Run(HOST, PORT, PROTOCOL)
+    log.Println("Running...")
+    src.Start()
 }

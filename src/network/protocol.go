@@ -1,24 +1,23 @@
 package network
 
-const (
-	PLAY int32 = iota - 1
-	HANDSHAKE
-	STATUS
-	LOGIN
+import (
+	"fmt"
+	"mango/src/network/packet/c2s"
+	"net"
 )
 
 func Handshake(conn net.Conn) {
 	var handshake c2s.Handshake
-	handshake.ReadFrom(conn)
+	handshake.ReadPacket(conn)
 	fmt.Println(handshake)
 
 	var request c2s.Request
-	request.ReadFrom(conn)
+	request.ReadPacket(conn)
 	fmt.Println(request)
 
 	// S2C_response
 
 	var ping c2s.Ping
-	ping.ReadFrom(conn)
+	ping.ReadPacket(conn)
 	fmt.Println(ping)
 }
