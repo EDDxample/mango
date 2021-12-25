@@ -1,23 +1,38 @@
 package network
 
 import (
-	"fmt"
+	"log"
 	"mango/src/network/packet/c2s"
+	"mango/src/network/packet/s2c"
 	"net"
 )
 
 func Handshake(conn net.Conn) {
 	var handshake c2s.Handshake
 	handshake.ReadPacket(conn)
-	fmt.Println(handshake)
 
-	var request c2s.Request
-	request.ReadPacket(conn)
-	fmt.Println(request)
+	switch handshake.NextState {
+	case 1:
+		log.Println("[i] Type: STATUS")
 
-	// S2C_response
+		// status
+		var request c2s.Request
+		request.ReadPacket(conn)
 
-	var ping c2s.Ping
-	ping.ReadPacket(conn)
-	fmt.Println(ping)
+		var status s2c.Status
+		status.Header.PacketID = 0
+		status.StatusData.Description = "Powered by man.go"
+		status.StatusData.Protocol = uint16(handshake.Protocol)
+		status.WritePacket(conn)
+
+		// ping
+		var ping c2s.Ping
+		ping.ReadPacket(conn)
+
+		var pong s2c.Pong
+		pong.Header.PacketID = 1
+		pong.Timestamp = ping.Timestamp
+		pong.WritePacket(conn)
+	}
+
 }

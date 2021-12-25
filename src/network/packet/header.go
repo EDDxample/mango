@@ -6,11 +6,17 @@ import (
 )
 
 type PacketHeader struct {
-	length     dt.VarInt
-	packetID   dt.VarInt
+	Length   dt.VarInt
+	PacketID dt.VarInt
 }
 
 func (pb *PacketHeader) ReadHeader(reader io.Reader) {
-	pb.length.ReadFrom(reader)
-	pb.packetID.ReadFrom(reader)
+	pb.Length.ReadFrom(reader)
+	pb.PacketID.ReadFrom(reader)
+}
+
+func (pb *PacketHeader) WriteHeader(buffer *[]byte) {
+	*buffer = append(pb.PacketID.Bytes(), *buffer...)
+	pb.Length = dt.VarInt(len(*buffer))
+	*buffer = append(pb.Length.Bytes(), *buffer...)
 }

@@ -18,11 +18,23 @@ func (s *Short) ReadFrom(reader io.Reader) (n int64, err error) {
 	return
 }
 
+func (s *Short) Bytes() (buffer []byte) {
+	buffer = make([]byte, 8)
+	binary.BigEndian.PutUint16(buffer, uint16(*s))
+	return buffer
+}
+
 type UShort uint16 // ====================================================
 
 func (s *UShort) ReadFrom(reader io.Reader) (n int64, err error) {
 	err = binary.Read(reader, binary.BigEndian, s)
 	return
+}
+
+func (s *UShort) Bytes() (buffer []byte) {
+	buffer = make([]byte, 8)
+	binary.BigEndian.PutUint16(buffer, uint16(*s))
+	return buffer
 }
 
 type String string // ====================================================
@@ -46,8 +58,15 @@ func (s *String) ReadFrom(reader io.Reader) (n int64, err error) {
 	return n, nil
 }
 
-func (s *String) WriteTo(writer io.Writer) {
+func (s *String) Bytes() (buffer []byte) {
 
+	strBytes := []byte(*s)
+	length := VarInt(len(strBytes))
+
+	buffer = append(buffer, length.Bytes()...)
+	buffer = append(buffer, strBytes...)
+
+	return buffer
 }
 
 type VarInt int32 // =====================================================
@@ -72,9 +91,36 @@ func (vi *VarInt) ReadFrom(reader io.Reader) (n int64, err error) {
 	return
 }
 
+func (vi *VarInt) Bytes() (buffer []byte) {
+	value := *vi
+
+	for i := 0; i < 5; i++ {
+		var current byte = byte(value & 0x7F)
+		value >>= 7
+
+		if value > 0 {
+			current |= 0x80
+		}
+
+		buffer = append(buffer, current)
+
+		if value == 0 {
+			return buffer
+		}
+
+	}
+	return
+}
+
 type Long int64 // =====================================================
 
-func (s *Long) ReadFrom(reader io.Reader) (n int64, err error) {
-	err = binary.Read(reader, binary.BigEndian, s)
+func (l *Long) ReadFrom(reader io.Reader) (n int64, err error) {
+	err = binary.Read(reader, binary.BigEndian, l)
 	return
+}
+
+func (l *Long) Bytes() (buffer []byte) {
+	buffer = make([]byte, 8)
+	binary.BigEndian.PutUint64(buffer, uint64(*l))
+	return buffer
 }

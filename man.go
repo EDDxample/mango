@@ -2,10 +2,10 @@ package main
 
 import (
 	"log"
-	"mango/src"
+	mango "mango/src"
 )
 
 func main() {
-    log.Println("Running...")
-    src.Start()
+	log.Println("Running...")
+	mango.Start()
 }
