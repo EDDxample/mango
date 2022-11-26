@@ -7,12 +7,16 @@ import (
 	"net"
 )
 
+const (
+	PROTOCOL_STATUS = 1
+)
+
 func Handshake(conn net.Conn) {
 	var handshake c2s.Handshake
 	handshake.ReadPacket(conn)
 
 	switch handshake.NextState {
-	case 1:
+	case PROTOCOL_STATUS:
 		log.Println("[i] Type: STATUS")
 
 		// status
@@ -34,5 +38,4 @@ func Handshake(conn net.Conn) {
 		pong.Timestamp = ping.Timestamp
 		pong.WritePacket(conn)
 	}
-
 }
