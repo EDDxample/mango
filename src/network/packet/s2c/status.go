@@ -13,12 +13,11 @@ type Status struct {
 }
 
 type StatusData struct {
-	Description string
-	Protocol    uint16
+	Protocol uint16
 }
 
 func (pk *Status) getStatusPayload() string {
-	return dt.GetDemoServerStatus(pk.StatusData.Description, int(pk.StatusData.Protocol))
+	return dt.GetDemoServerStatus(int(pk.StatusData.Protocol))
 }
 
 func (pk *Status) ReadPacket(reader io.Reader) {

@@ -9,6 +9,7 @@ import (
 
 const (
 	PROTOCOL_STATUS = 1
+	PROTOCOL_LOGIN  = 2
 )
 
 func Handshake(conn net.Conn) {
@@ -17,7 +18,7 @@ func Handshake(conn net.Conn) {
 
 	switch handshake.NextState {
 	case PROTOCOL_STATUS:
-		log.Println("[i] Type: STATUS")
+		log.Println("[i] Phase: STATUS")
 
 		// status
 		var request c2s.Request
@@ -25,7 +26,6 @@ func Handshake(conn net.Conn) {
 
 		var status s2c.Status
 		status.Header.PacketID = 0
-		status.StatusData.Description = "Powered by man.go"
 		status.StatusData.Protocol = uint16(handshake.Protocol)
 		status.WritePacket(conn)
 
@@ -37,5 +37,17 @@ func Handshake(conn net.Conn) {
 		pong.Header.PacketID = 1
 		pong.Timestamp = ping.Timestamp
 		pong.WritePacket(conn)
+
+	case PROTOCOL_LOGIN:
+		log.Println("[i] Phase: LOGIN")
+
+		var request c2s.LoginStart
+		request.ReadPacket(conn)
+
+		var response s2c.LoginSuccess
+		response.Username = request.Name
+		response.WritePacket(conn)
+
+		log.Println("[i] Phase: PLAY")
 	}
 }
