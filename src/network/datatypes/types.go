@@ -55,7 +55,7 @@ func (s *String) ReadFrom(reader io.Reader) (n int64, err error) {
 	n += int64(length)
 
 	*s = String(stringBytes)
-	return n, nil
+	return
 }
 
 func (s *String) Bytes() (buffer []byte) {
@@ -123,4 +123,33 @@ func (l *Long) Bytes() (buffer []byte) {
 	buffer = make([]byte, 8)
 	binary.BigEndian.PutUint64(buffer, uint64(*l))
 	return buffer
+}
+
+type Boolean bool
+
+func (b *Boolean) ReadFrom(reader io.Reader) (n int64, err error) {
+	val, err := ReadByte(reader)
+	*b = val != 0
+	return
+}
+
+func (b *Boolean) Bytes() (buffer []byte) {
+	buffer = make([]byte, 1)
+	if *b {
+		buffer[0] = 1
+	} else {
+		buffer[0] = 0
+	}
+
+	return buffer
+}
+
+type ByteArray []byte
+
+func (ba *ByteArray) Read(r io.Reader, length VarInt) (n int64, err error) {
+	tmp := make([]byte, length)
+	_, err = r.Read(tmp)
+	*ba = tmp
+
+	return
 }
