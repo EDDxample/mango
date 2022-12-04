@@ -146,6 +146,7 @@ func (b *Boolean) Bytes() (buffer []byte) {
 
 type ByteArray []byte
 
+// FIXME
 func (ba *ByteArray) Read(r io.Reader, length VarInt) (n int64, err error) {
 	tmp := make([]byte, length)
 	_, err = r.Read(tmp)

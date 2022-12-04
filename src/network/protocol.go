@@ -2,6 +2,7 @@ package network
 
 import (
 	"log"
+	"mango/src/config"
 	"mango/src/network/packet/c2s"
 	"mango/src/network/packet/s2c"
 	"net"
@@ -43,6 +44,10 @@ func Handshake(conn net.Conn) {
 
 		var request c2s.LoginStart
 		request.ReadPacket(conn)
+
+		if config.GConfig().IsOnline() {
+			// TODO implement cypher
+		}
 
 		var response s2c.LoginSuccess
 		response.Username = request.Name

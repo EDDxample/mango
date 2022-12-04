@@ -7,11 +7,11 @@ import (
 )
 
 type Handshake struct {
-	Header	   packet.PacketHeader
-	Protocol   dt.VarInt
-	Address    dt.String
-	Port       dt.UShort
-	NextState  dt.VarInt
+	Header    packet.PacketHeader
+	Protocol  dt.VarInt
+	Address   dt.String
+	Port      dt.UShort
+	NextState dt.VarInt
 }
 
 func (pk *Handshake) ReadPacket(reader io.Reader) {
