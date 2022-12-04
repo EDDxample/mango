@@ -5,12 +5,12 @@ Minecraft Advanced Network in go (Minecraft Server)
 `$ go run .`
 
 ## TODO
-- Project refactor ✔️
-- Status protocol ✔️
-- Login protocol
-- Join game protocol
-- Implement error handling
-- Add config file
+- [x] Project refactor ️
+- [x] Status protocol 
+- [ ] Login protocol (Offline implemented)
+- [ ] Join game protocol
+- [x] Implement error handling 
+- [x] Add config file
 
 ## Resources
 
