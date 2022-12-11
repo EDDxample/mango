@@ -3,13 +3,13 @@ package nbt
 import (
 	"bytes"
 	"errors"
-	"log"
+	"mango/src/logger"
 )
 
 func ReadFile(filename string) NBTTag {
 	file, err := DecompressFile(filename)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal(err)
 	}
 
 	r := bytes.NewReader(file)
@@ -36,16 +36,16 @@ func Read(stream *NBTByteStream) NBTTag {
 func readImplicitCompound(stream *NBTByteStream) NBTTag {
 	tagType, err := stream.ReadByte()
 	if err != nil {
-		log.Fatalf("Couldn't read tagType, %s\n", err)
+		logger.Fatal("Couldn't read tagType, %s", err)
 	}
 
 	if tagType != TAG_COMPOUND {
-		log.Fatalf("Expected TAG_COMPOUND but got %s\n", TagTypeToString(tagType))
+		logger.Fatal("Expected TAG_COMPOUND but got %s\n", TagTypeToString(tagType))
 	}
 
 	str, err := stream.ReadString()
 	if err != nil {
-		log.Fatalf("Error reading string %s\n", err)
+		logger.Fatal("Error reading string %s", err)
 	}
 
 	base := GetNbtCompound(stream)
@@ -57,23 +57,23 @@ func GetNbtCompound(stream *NBTByteStream) NBTTag {
 	nbtTagCompound := NewCompound()
 	nextTag, err := stream.ReadByte()
 	if err != nil {
-		log.Fatal("Error reading the name tag, ", err)
+		logger.Fatal("Error reading the name tag, %s", err)
 	}
 
 	for nextTag != TAG_END {
 		name, err := stream.ReadString()
 		if err != nil {
-			log.Fatalf("Couln't read string, %s\n", err)
+			logger.Fatal("Couln't read string, %s", err)
 		}
 
 		err = readNbtTag(nextTag, stream, &nbtTagCompound, name)
 		if err != nil {
-			log.Fatalf("Couldn't read NBT %s\n", err)
+			logger.Fatal("Couldn't read NBT %s", err)
 		}
 
 		nextTag, err = stream.ReadByte()
 		if err != nil {
-			log.Fatal("Couldn't read next tag, ", err)
+			logger.Fatal("Couldn't read next tag, %s", err)
 		}
 	}
 

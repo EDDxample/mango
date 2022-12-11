@@ -2,9 +2,9 @@ package src
 
 import (
 	"fmt"
-	"log"
 	"mango/src/config"
 	"mango/src/helper"
+	"mango/src/logger"
 	"mango/src/network"
 	"net"
 )
@@ -20,16 +20,16 @@ func Start() {
 
 	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", address, port))
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal(err)
 	}
 	defer listener.Close()
 
-	log.Printf("[i] Listening on %s:%d...\n", address, port)
+	logger.Info("Listening on %s:%d...", address, port)
 
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
-			log.Printf("[!] Error accepting the connection\n")
+			logger.Error("Error accepting the connection")
 			continue
 		}
 
@@ -41,10 +41,10 @@ func handleConn(conn net.Conn) {
 	defer conn.Close()
 	defer func() {
 		if err := recover(); err != nil {
-			log.Printf("[!] Error while handling connection (origin: %s): %s\n", helper.GetPanicReportData(), err)
+			logger.Error("Error while handling connection (origin: %s): %s\n", helper.GetPanicReportData(), err)
 		}
 	}()
 
-	log.Printf("[+] New connection from %s\n", conn.RemoteAddr())
+	logger.Info("New connection from %s\n", conn.RemoteAddr())
 	network.Handshake(conn)
 }

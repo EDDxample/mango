@@ -1,8 +1,8 @@
 package network
 
 import (
-	"log"
 	"mango/src/config"
+	"mango/src/logger"
 	"mango/src/network/packet/c2s"
 	"mango/src/network/packet/s2c"
 	"net"
@@ -19,7 +19,7 @@ func Handshake(conn net.Conn) {
 
 	switch handshake.NextState {
 	case PROTOCOL_STATUS:
-		log.Println("[i] Phase: STATUS")
+		logger.Info("Phase: STATUS")
 
 		// status
 		var request c2s.Request
@@ -40,7 +40,7 @@ func Handshake(conn net.Conn) {
 		pong.WritePacket(conn)
 
 	case PROTOCOL_LOGIN:
-		log.Println("[i] Phase: LOGIN")
+		logger.Info("Phase: LOGIN")
 
 		var request c2s.LoginStart
 		request.ReadPacket(conn)
@@ -53,6 +53,6 @@ func Handshake(conn net.Conn) {
 		response.Username = request.Name
 		response.WritePacket(conn)
 
-		log.Println("[i] Phase: PLAY")
+		logger.Info("Phase: PLAY")
 	}
 }
