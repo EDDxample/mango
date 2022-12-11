@@ -29,11 +29,16 @@ func (gc GlobalConfig) IsOnline() bool {
 	return gc.Server.Online
 }
 
+func (gc GlobalConfig) DebugMode() bool {
+	return gc.Server.Debug
+}
+
 type ServerConfig struct {
 	Host   string `yaml:"host"`
 	Port   int    `yaml:"port"`
 	Online bool   `yaml:"online"`
 	Motd   string `yaml:"motd"`
+	Debug  bool   `yaml:"debug"`
 }
 
 func Parse() {
