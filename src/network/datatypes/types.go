@@ -4,6 +4,8 @@ import (
 	"encoding/binary"
 	"errors"
 	"io"
+
+	"mango/src/nbt"
 )
 
 func ReadByte(reader io.Reader) (value byte, err error) {
@@ -144,13 +146,44 @@ func (b *Boolean) Bytes() (buffer []byte) {
 	return buffer
 }
 
-type ByteArray []byte
+type Byte byte
 
-// FIXME
-func (ba *ByteArray) Read(r io.Reader, length VarInt) (n int64, err error) {
-	tmp := make([]byte, length)
-	_, err = r.Read(tmp)
-	*ba = tmp
+func (b *Byte) ReadFrom(reader io.Reader) (n int64, err error) {
+	val, err := ReadByte(reader)
+	*b = Byte(val)
+	return
+}
 
+func (b *Byte) Bytes() (buffer []byte) {
+	buffer = make([]byte, 1)
+	buffer[0] = byte(*b)
+
+	return buffer
+}
+
+type UByte uint8
+
+func (b *UByte) ReadFrom(reader io.Reader) (n int64, err error) {
+	val, err := ReadByte(reader)
+	*b = UByte(val)
+	return
+}
+
+func (b *UByte) Bytes() (buffer []byte) {
+	buffer = make([]byte, 1)
+	buffer[0] = byte(*b)
+
+	return buffer
+}
+
+type NbtCompound nbt.NBTTag // Should have NBTType as a compound
+
+func (nc *NbtCompound) ReadFrom(reader io.Reader) (n int64, err error) {
+	// TODO
+	return
+}
+
+func (nc *NbtCompound) Bytes() (buffer []byte) {
+	buffer = nbt.Marshal(nbt.NBTTag(*nc))
 	return
 }

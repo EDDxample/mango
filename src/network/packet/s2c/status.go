@@ -1,7 +1,6 @@
 package s2c
 
 import (
-	"io"
 	dt "mango/src/network/datatypes"
 	"mango/src/network/packet"
 )
@@ -20,12 +19,7 @@ func (pk *Status) getStatusPayload() string {
 	return dt.GetDemoServerStatus(int(pk.StatusData.Protocol))
 }
 
-func (pk *Status) ReadPacket(reader io.Reader) {
-	pk.Header.ReadHeader(reader)
-	pk.JsonPayload.ReadFrom(reader)
-}
-
-func (pk *Status) WritePacket(writer io.Writer) {
+func (pk *Status) Bytes() []byte {
 	pk.JsonPayload = dt.String(pk.getStatusPayload())
 
 	var data []byte
@@ -33,5 +27,5 @@ func (pk *Status) WritePacket(writer io.Writer) {
 
 	pk.Header.WriteHeader(&data)
 
-	writer.Write(data)
+	return data
 }

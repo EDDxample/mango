@@ -41,8 +41,8 @@ type ServerConfig struct {
 	Debug  bool   `yaml:"debug"`
 }
 
-func Parse() {
-	file, err := os.ReadFile("config.yml")
+func Parse(path string) {
+	file, err := os.ReadFile(path)
 	if err != nil {
 		log.Fatal(err)
 	}

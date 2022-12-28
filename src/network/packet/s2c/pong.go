@@ -1,7 +1,6 @@
 package s2c
 
 import (
-	"io"
 	dt "mango/src/network/datatypes"
 	"mango/src/network/packet"
 )
@@ -11,15 +10,10 @@ type Pong struct {
 	Timestamp dt.Long
 }
 
-func (pk *Pong) ReadPacket(reader io.Reader) {
-	pk.Header.ReadHeader(reader)
-	pk.Timestamp.ReadFrom(reader)
-}
-
-func (pk *Pong) WritePacket(writer io.Writer) {
+func (pk *Pong) Bytes() []byte {
 	var data []byte
 	data = append(data, pk.Timestamp.Bytes()...)
 	pk.Header.WriteHeader(&data)
 
-	writer.Write(data)
+	return data
 }

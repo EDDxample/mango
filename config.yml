@@ -3,3 +3,4 @@ server:
   port: 25565
   online: false
   motd: Powered by man.go
+  debug: true
