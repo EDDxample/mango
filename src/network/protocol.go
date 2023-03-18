@@ -2,11 +2,12 @@ package network
 
 import (
 	"bytes"
+	"fmt"
 	"mango/src/config"
 	"mango/src/logger"
-	"mango/src/network/datatypes"
 	"mango/src/network/packet/c2s"
 	"mango/src/network/packet/s2c"
+	"mango/src/utils"
 )
 
 const (
@@ -16,40 +17,59 @@ const (
 	PROTOCOL_CLIENT_INFORMATION = 0x07
 )
 
-func HandlePacket(conn *datatypes.Connection, packet datatypes.RawPacket) {
+func protocolToString(protocol int32) string {
+	switch protocol {
+	case PROTOCOL_PING:
+		return "PROTOCOL_PING"
+	case PROTOCOL_STATUS:
+		return "PROTOCOL_STATUS"
+	case PROTOCOL_LOGIN:
+		return "PROTOCOL_LOGIN"
+	case PROTOCOL_CLIENT_INFORMATION:
+		return "PROTOCOL_CLIENT_INFORMATION"
+	default:
+		return fmt.Sprintf("UNKWONW: %d", protocol)
+	}
+}
+
+func HandlePacket(conn *Connection, data []byte) {
 	logger.Debug("Ini: HandlePacket")
-	packetReader := bytes.NewReader(packet)
+
+	reader := bytes.NewReader(data)
 
 	var handshake c2s.Handshake
-	handshake.ReadPacket(packetReader)
-	logger.Debug("Handshake protocol from %s: %d", conn.RawConn.RemoteAddr().String(), handshake.NextState)
+	handshake.ReadPacket(reader)
+	logger.Debug("Handshake protocol from %s, next state: %s", conn.connection.RemoteAddr().String(), protocolToString(int32(handshake.NextState)))
+	logger.Debug("Packet readed: %+v", handshake)
 
 	switch handshake.NextState {
 	case PROTOCOL_PING:
+		logger.Debug("Phase PING")
 		var ping c2s.Ping
-		ping.ReadPacket(packetReader)
+		ping.ReadPacket(reader)
 
 		var pong s2c.Pong
 		pong.Header.PacketID = 1
 		pong.Timestamp = ping.Timestamp
-		conn.OutboundPackets <- pong.Bytes()
+		conn.outgoingPackets <- utils.NewBufferWith(pong.Bytes())
 		logger.Debug("PING Ended")
 	case PROTOCOL_STATUS:
-		logger.Info("Phase STATUS")
+		logger.Debug("Phase STATUS")
 
 		// Status
 		var request c2s.Request
-		request.ReadPacket(packetReader)
+		request.ReadPacket(reader)
 
 		var status s2c.Status
 		status.Header.PacketID = 0
 		status.StatusData.Protocol = uint16(handshake.Protocol)
-		conn.OutboundPackets <- datatypes.RawPacket(status.Bytes())
+		conn.outgoingPackets <- utils.NewBufferWith(status.Bytes())
+		logger.Debug("STATUSU Ended")
 	case PROTOCOL_LOGIN:
-		logger.Info("Phase: LOGIN")
+		logger.Debug("Phase: LOGIN")
 
 		var request c2s.LoginStart
-		request.ReadPacket(packetReader)
+		request.ReadPacket(reader)
 
 		if config.GConfig().IsOnline() {
 			// TODO implement cypher
@@ -57,13 +77,13 @@ func HandlePacket(conn *datatypes.Connection, packet datatypes.RawPacket) {
 
 		var response s2c.LoginSuccess
 		response.Username = request.Name
-		conn.OutboundPackets <- response.Bytes()
+		conn.outgoingPackets <- utils.NewBufferWith(response.Bytes())
 		logger.Debug("LOGIN Ended")
 	case PROTOCOL_CLIENT_INFORMATION:
-		logger.Info("Phase: CLIENT_INFORMATION")
+		logger.Debug("Phase: CLIENT_INFORMATION")
 
 		var request c2s.ClientInformation
-		request.ReadPacket(packetReader)
+		request.ReadPacket(reader)
 
 		logger.Debug("ClientInformation: %+v", request)
 	}
