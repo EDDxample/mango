@@ -75,8 +75,8 @@ func (server *MinecraftServer) Start() {
 
 // See .notes/01_init_server.png
 func (server *MinecraftServer) bootstrap() error {
-	host := config.GConfig().Host()
-	port := config.GConfig().Port()
+	host := config.Host()
+	port := config.Port()
 
 	// Start TCP listener
 	if err := server.connListener.Start(host, port); err != nil {

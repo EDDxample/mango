@@ -71,7 +71,7 @@ func HandlePacket(conn *Connection, data []byte) {
 		var request c2s.LoginStart
 		request.ReadPacket(reader)
 
-		if config.GConfig().IsOnline() {
+		if config.IsOnline() {
 			// TODO implement cypher
 		}
 
