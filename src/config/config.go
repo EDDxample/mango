@@ -3,6 +3,7 @@ package config
 import (
 	"log"
 	"os"
+	"strings"
 
 	"github.com/go-yaml/yaml"
 )
@@ -11,26 +12,42 @@ var gconfig GlobalConfig
 
 type GlobalConfig struct {
 	Server ServerConfig `yaml:"server"`
+	Logger LoggerConfig `yaml:"logger"`
 }
 
-func (gc GlobalConfig) Motd() string {
-	return gc.Server.Motd
+func Motd() string {
+	return gconfig.Server.Motd
 }
 
-func (gc GlobalConfig) Host() string {
-	return gc.Server.Host
+func Host() string {
+	return gconfig.Server.Host
 }
 
-func (gc GlobalConfig) Port() int {
-	return gc.Server.Port
+func Port() int {
+	return gconfig.Server.Port
 }
 
-func (gc GlobalConfig) IsOnline() bool {
-	return gc.Server.Online
+func IsOnline() bool {
+	return gconfig.Server.Online
 }
 
-func (gc GlobalConfig) DebugMode() bool {
-	return gc.Server.Debug
+func LogLevel() LoggerLevel {
+	switch strings.ToUpper(gconfig.Logger.Level) {
+	case "OFF":
+		return OFF
+	case "DEBUG":
+		return DEBUG
+	case "INFO":
+		return INFO
+	case "WARN":
+		return WARN
+	case "ERROR":
+		return ERROR
+	case "FATAL":
+		return FATAL
+	default:
+		return INFO
+	}
 }
 
 type ServerConfig struct {
@@ -38,8 +55,22 @@ type ServerConfig struct {
 	Port   int    `yaml:"port"`
 	Online bool   `yaml:"online"`
 	Motd   string `yaml:"motd"`
-	Debug  bool   `yaml:"debug"`
 }
+
+type LoggerConfig struct {
+	Level string `yaml:"level"`
+}
+
+type LoggerLevel int
+
+const (
+	DEBUG LoggerLevel = iota
+	INFO
+	WARN
+	ERROR
+	FATAL
+	OFF
+)
 
 func Parse(path string) {
 	file, err := os.ReadFile(path)
@@ -48,8 +79,4 @@ func Parse(path string) {
 	}
 
 	yaml.Unmarshal([]byte(file), &gconfig)
-}
-
-func GConfig() GlobalConfig {
-	return gconfig
 }

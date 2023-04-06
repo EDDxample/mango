@@ -2,8 +2,9 @@ package main
 
 import (
 	"flag"
-	mango "mango/src"
+
 	"mango/src/config"
+	mango "mango/src/server"
 )
 
 var (
@@ -13,7 +14,7 @@ var (
 func main() {
 	flag.Parse()
 	config.Parse(*configPath)
-	//mango.Start()
+
 	server := mango.NewServer()
 	server.Start()
 }
