@@ -43,8 +43,13 @@ func NewConnection(connection net.Conn) IConnection {
 
 func (c *Connection) Tick() {
 	if c.running {
-		for packet := range c.incomingPackets {
-			HandlePacket(c, packet.GetUnsignedArray())
+		for {
+			select {
+			case packet := <-c.incomingPackets:
+				HandlePacket(c, packet.GetUnsignedArray())
+			default:
+				return
+			}
 		}
 	}
 }
