@@ -4,7 +4,6 @@ import (
 	"mango/src/config"
 	"mango/src/logger"
 	"mango/src/network"
-	net "mango/src/network"
 	"time"
 )
 
@@ -29,7 +28,7 @@ type MinecraftServer struct {
 }
 
 func NewServer() *MinecraftServer {
-	connListener := net.NewConnectionListener()
+	connListener := network.NewConnectionListener()
 	return &MinecraftServer{
 		running:      true,
 		tickCount:    0,
@@ -109,7 +108,8 @@ func (server *MinecraftServer) TickChildren() {
 	// TODO: tick cmd functions
 
 	// tick worlds
-	for _, _ = range server.worlds {
+
+	for range server.worlds {
 
 		/*
 			// sync world time every second
