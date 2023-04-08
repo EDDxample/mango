@@ -77,6 +77,9 @@ func HandlePacket(conn *Connection, data []byte) {
 
 		var response s2c.LoginSuccess
 		response.Username = request.Name
+		if request.HasUUID {
+			response.UUID = request.UUID
+		}
 		conn.outgoingPackets <- utils.NewBufferWith(response.Bytes())
 		logger.Debug("LOGIN Ended")
 	case PROTOCOL_CLIENT_INFORMATION:
