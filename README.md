@@ -1,8 +1,9 @@
 # mango
 Minecraft Advanced Network in go (Minecraft Server) 
 
+![banner](assets/img.png)
 
-`$ go run .`
+`$ go run man.go`
 
 ## TODO
 - [x] Project refactor
@@ -15,5 +16,4 @@ Minecraft Advanced Network in go (Minecraft Server)
 - [ ] Join game protocol
 
 ## Resources
-
 MC Protocol: https://wiki.vg/Protocol
