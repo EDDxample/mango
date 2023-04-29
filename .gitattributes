@@ -1,0 +1,4 @@
+# Fixes line ending issues between windows and linux
+* text=auto eol=lf
+*.{cmd,[cC][mM][dD]} text eol=crlf
+*.{bat,[bB][aA][tT]} text eol=crlf
