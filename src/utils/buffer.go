@@ -64,7 +64,7 @@ func (b *Buffer) readVariable(maxBytes int) int64 {
 
 	for {
 		currentByte := int64(b.readNext())
-		out |= (currentByte & 0x7F) << i * 7
+		out |= (currentByte & 0x7F) << (i * 7)
 
 		if i++; i > maxBytes {
 			panic("omg holy shit man wtf btw")
