@@ -11,6 +11,7 @@ import (
 
 type IConnection interface {
 	Tick()
+	IsAlive() bool
 	Close()
 }
 
@@ -83,7 +84,7 @@ func (c *Connection) handleIncomingPackets() {
 			break
 		}
 
-		// split packets and push them into incomingPackets
+		// split packets and push them into `incomingPackets`
 		reader := bytes.NewReader(data)
 		for start := 0; start < size; {
 			reader.Seek(int64(start), io.SeekStart)
@@ -130,6 +131,11 @@ func (c *Connection) setTimeout() {
 	} else {
 		c.connection.SetReadDeadline(time.Now().Add(10 * time.Second))
 	}
+}
+
+func (c *Connection) IsAlive() bool {
+	return c.running
+
 }
 
 func (c *Connection) Close() {

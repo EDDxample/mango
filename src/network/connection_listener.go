@@ -49,9 +49,23 @@ func (listener *ConnectionListener) Tick() {
 	listener.lock.RLock()
 	defer listener.lock.RUnlock()
 
+	i := 0
 	for _, connection := range listener.connections {
-		connection.Tick()
+		if connection.IsAlive() {
+			connection.Tick()
+
+			// move alive connections to the front
+			listener.connections[i] = connection
+			i++
+		}
 	}
+
+	// clear and remove closing connections from the back
+	// https://utcc.utoronto.ca/~cks/space/blog/programming/GoSlicesMemoryLeak
+	for j := i; j < len(listener.connections); j++ {
+		listener.connections[j] = nil
+	}
+	listener.connections = listener.connections[:i]
 }
 
 func (listener *ConnectionListener) addConnection(connection *net.TCPConn) {
