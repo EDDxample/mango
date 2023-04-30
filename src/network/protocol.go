@@ -2,92 +2,95 @@ package network
 
 import (
 	"bytes"
-	"fmt"
+	"io"
 	"mango/src/config"
-	"mango/src/logger"
+	"mango/src/network/packet"
 	"mango/src/network/packet/c2s"
 	"mango/src/network/packet/s2c"
-	"mango/src/utils"
 )
 
-const (
-	PROTOCOL_PING               = 0x00
-	PROTOCOL_STATUS             = 0x01
-	PROTOCOL_LOGIN              = 0x02
-	PROTOCOL_CLIENT_INFORMATION = 0x07
-)
-
-func protocolToString(protocol int32) string {
-	switch protocol {
-	case PROTOCOL_PING:
-		return "PROTOCOL_PING"
-	case PROTOCOL_STATUS:
-		return "PROTOCOL_STATUS"
-	case PROTOCOL_LOGIN:
-		return "PROTOCOL_LOGIN"
-	case PROTOCOL_CLIENT_INFORMATION:
-		return "PROTOCOL_CLIENT_INFORMATION"
-	default:
-		return fmt.Sprintf("UNKWONW: %d", protocol)
-	}
-}
-
-func HandlePacket(conn *Connection, data []byte) {
-	logger.Debug("Ini: HandlePacket")
-
-	reader := bytes.NewReader(data)
+func HandleHandshakePacket(conn *Connection, data *[]byte) {
+	reader := bytes.NewReader(*data)
 
 	var handshake c2s.Handshake
 	handshake.ReadPacket(reader)
-	logger.Debug("Handshake protocol from %s, next state: %s", conn.connection.RemoteAddr().String(), protocolToString(int32(handshake.NextState)))
-	logger.Debug("Packet readed: %+v", handshake)
+	conn.state = ConnectionState(handshake.NextState)
+}
 
-	switch handshake.NextState {
-	case PROTOCOL_PING:
-		logger.Debug("Phase PING")
+func HandleStatusPacket(conn *Connection, data *[]byte) {
+	reader := bytes.NewReader(*data)
+
+	var header packet.PacketHeader
+	header.ReadHeader(reader)
+
+	reader.Seek(0, io.SeekStart)
+
+	switch header.PacketID {
+	case 0x00: // status packet
+		var statusRequest c2s.Request
+		statusRequest.ReadPacket(reader)
+
+		var statusResponse s2c.Status
+		statusResponse.Header.PacketID = 0
+		statusResponse.StatusData.Protocol = uint16(762) // conn.Protocol
+
+		packetBytes := statusResponse.Bytes()
+		conn.outgoingPackets <- &packetBytes
+
+	case 0x01: // ping packet
 		var ping c2s.Ping
 		ping.ReadPacket(reader)
 
 		var pong s2c.Pong
 		pong.Header.PacketID = 1
 		pong.Timestamp = ping.Timestamp
-		conn.outgoingPackets <- utils.NewBufferWith(pong.Bytes())
-		logger.Debug("PING Ended")
-	case PROTOCOL_STATUS:
-		logger.Debug("Phase STATUS")
 
-		// Status
-		var request c2s.Request
-		request.ReadPacket(reader)
+		packetBytes := pong.Bytes()
+		conn.outgoingPackets <- &packetBytes
+	}
+}
 
-		var status s2c.Status
-		status.Header.PacketID = 0
-		status.StatusData.Protocol = uint16(handshake.Protocol)
-		conn.outgoingPackets <- utils.NewBufferWith(status.Bytes())
-		logger.Debug("STATUSU Ended")
-	case PROTOCOL_LOGIN:
-		logger.Debug("Phase: LOGIN")
+func HandleLoginPacket(conn *Connection, data *[]byte) {
+	reader := bytes.NewReader(*data)
 
-		var request c2s.LoginStart
-		request.ReadPacket(reader)
+	var header packet.PacketHeader
+	header.ReadHeader(reader)
+
+	reader.Seek(0, io.SeekStart)
+
+	switch header.PacketID {
+	case 0x00: // Login Start
+		var loginStart c2s.LoginStart
+		loginStart.ReadPacket(reader)
 
 		if config.IsOnline() {
-			// TODO implement cypher
+			// TODO: implement cypher and return EncryptionRequest
+
+		} else { // Offline mode, return LoginSuccess
+			var logingSuccess s2c.LoginSuccess
+			logingSuccess.Header.PacketID = 2
+			logingSuccess.Username = loginStart.Name
+			if loginStart.HasUUID {
+				logingSuccess.UUID = loginStart.UUID
+			}
+
+			packetBytes := logingSuccess.Bytes()
+			conn.outgoingPackets <- &packetBytes
+			conn.state = PLAY
 		}
+	}
+}
 
-		var response s2c.LoginSuccess
-		response.Username = request.Name
-		if request.HasUUID {
-			response.UUID = request.UUID
-		}
-		conn.outgoingPackets <- utils.NewBufferWith(response.Bytes())
-		logger.Debug("LOGIN Ended")
-	case PROTOCOL_CLIENT_INFORMATION:
-		logger.Debug("Phase: CLIENT_INFORMATION")
+func HandlePlayPacket(conn *Connection, data *[]byte) {
+	reader := bytes.NewReader(*data)
 
-		var request c2s.ClientInformation
-		request.ReadPacket(reader)
+	var header packet.PacketHeader
+	header.ReadHeader(reader)
 
-		logger.Debug("ClientInformation: %+v", request)
+	reader.Seek(0, io.SeekStart)
+
+	switch header.PacketID {
+	case 0x28: // Login (Play)
+	case 0x50: // SetDefaultSpawnPosition
 	}
 }

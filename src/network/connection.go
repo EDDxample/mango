@@ -1,8 +1,10 @@
 package network
 
 import (
+	"bytes"
+	"io"
 	"mango/src/logger"
-	"mango/src/utils"
+	dt "mango/src/network/datatypes"
 	"net"
 	"time"
 )
@@ -25,16 +27,17 @@ type Connection struct {
 	connection      net.Conn
 	running         bool
 	state           ConnectionState
-	incomingPackets chan *utils.Buffer
-	outgoingPackets chan *utils.Buffer
+	incomingPackets chan *[]byte
+	outgoingPackets chan *[]byte
 }
 
 func NewConnection(connection net.Conn) IConnection {
 	instance := &Connection{
 		connection:      connection,
+		state:           SHAKE,
 		running:         true,
-		incomingPackets: make(chan *utils.Buffer, 10),
-		outgoingPackets: make(chan *utils.Buffer, 10),
+		incomingPackets: make(chan *[]byte, 10),
+		outgoingPackets: make(chan *[]byte, 10),
 	}
 	go instance.handleIncomingPackets()
 	go instance.handleOutgoingPackets()
@@ -46,7 +49,16 @@ func (c *Connection) Tick() {
 		for {
 			select {
 			case packet := <-c.incomingPackets:
-				HandlePacket(c, packet.GetUnsignedArray())
+				switch c.state {
+				case SHAKE:
+					HandleHandshakePacket(c, packet)
+				case STATUS:
+					HandleStatusPacket(c, packet)
+				case LOGIN:
+					HandleLoginPacket(c, packet)
+				case PLAY:
+					HandlePlayPacket(c, packet)
+				}
 			default:
 				return
 			}
@@ -71,17 +83,29 @@ func (c *Connection) handleIncomingPackets() {
 			break
 		}
 
-		buffer := utils.NewBufferWith(data)
+		// split packets and push them into incomingPackets
+		reader := bytes.NewReader(data)
+		for start := 0; start < size; {
+			reader.Seek(int64(start), io.SeekStart)
 
-		packetLength := buffer.ReadVarInt()
+			var packetLength dt.VarInt
+			n, err := packetLength.ReadFrom(reader)
+			if err != nil || packetLength == 0 {
+				if err != nil {
+					logger.Info("Client disconnected: %s (Reason: %s)", c.connection.RemoteAddr(), err)
+					c.running = false
+				}
+				break
+			}
 
-		i := buffer.GetInputIndex()
-		packetBuffer := utils.NewBufferWith(buffer.GetUnsignedArray()[i-1 : i+packetLength])
+			end := start + int(n) + int(packetLength)
 
-		// packetBuffer := utils.NewBufferWith(data)
+			packetBytes := data[start:end]
+			start = end
 
-		logger.Debug("[C > S] %d", packetLength)
-		c.incomingPackets <- packetBuffer
+			logger.Debug("[S < %s] %d, %v", c.connection.RemoteAddr(), packetLength, packetBytes)
+			c.incomingPackets <- &packetBytes
+		}
 	}
 	c.running = false
 }
@@ -91,9 +115,8 @@ func (c *Connection) handleOutgoingPackets() {
 	for c.running {
 		select {
 		case packet := <-c.outgoingPackets:
-			arr := packet.GetUnsignedArray()
-			logger.Debug("[S > C] %+v", arr)
-			c.connection.Write(arr)
+			logger.Debug("[S > %s] %+v", c.connection.RemoteAddr().String(), len(*packet))
+			c.connection.Write(*packet)
 		default:
 			continue
 		}
