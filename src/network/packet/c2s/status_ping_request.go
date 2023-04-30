@@ -6,12 +6,12 @@ import (
 	"mango/src/network/packet"
 )
 
-type Ping struct {
-	Header     packet.PacketHeader
-	Timestamp  dt.Long
+type PingRequest struct {
+	Header    packet.PacketHeader
+	Timestamp dt.Long
 }
 
-func (pk *Ping) ReadPacket(reader io.Reader) {
+func (pk *PingRequest) ReadPacket(reader io.Reader) {
 	pk.Header.ReadHeader(reader)
 	pk.Timestamp.ReadFrom(reader)
 }

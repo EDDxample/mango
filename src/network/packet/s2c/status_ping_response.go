@@ -5,12 +5,12 @@ import (
 	"mango/src/network/packet"
 )
 
-type Pong struct {
+type PingResponse struct {
 	Header    packet.PacketHeader
 	Timestamp dt.Long
 }
 
-func (pk *Pong) Bytes() []byte {
+func (pk *PingResponse) Bytes() []byte {
 	var data []byte
 	data = append(data, pk.Timestamp.Bytes()...)
 	pk.Header.WriteHeader(&data)

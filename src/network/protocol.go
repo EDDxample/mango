@@ -27,7 +27,7 @@ func HandleStatusPacket(conn *Connection, data *[]byte) {
 
 	switch header.PacketID {
 	case 0x00: // status packet
-		var statusRequest c2s.Request
+		var statusRequest c2s.StatusRequest
 		statusRequest.ReadPacket(reader)
 
 		var statusResponse s2c.Status
@@ -38,10 +38,10 @@ func HandleStatusPacket(conn *Connection, data *[]byte) {
 		conn.outgoingPackets <- &packetBytes
 
 	case 0x01: // ping packet
-		var ping c2s.Ping
+		var ping c2s.PingRequest
 		ping.ReadPacket(reader)
 
-		var pong s2c.Pong
+		var pong s2c.PingResponse
 		pong.Header.PacketID = 1
 		pong.Timestamp = ping.Timestamp
 

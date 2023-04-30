@@ -13,20 +13,20 @@ type LoginSuccess struct {
 
 func (pk *LoginSuccess) Bytes() []byte {
 	pk.Header.PacketID = 2
-	var dataBuf []byte
+	var data []byte
 
 	if pk.UUID != nil && len(pk.UUID) != 0 {
-		dataBuf = append(dataBuf, pk.UUID...)
+		data = append(data, pk.UUID...)
 	} else {
 		uuid1 := dt.Long(0xEDD)
 		uuid2 := dt.Long(0x1337)
-		dataBuf = append(dataBuf, uuid1.Bytes()...)
-		dataBuf = append(dataBuf, uuid2.Bytes()...)
+		data = append(data, uuid1.Bytes()...)
+		data = append(data, uuid2.Bytes()...)
 	}
 
-	dataBuf = append(dataBuf, pk.Username.Bytes()...)
-	dataBuf = append(dataBuf, 0x00)
-	pk.Header.WriteHeader(&dataBuf)
+	data = append(data, pk.Username.Bytes()...)
+	data = append(data, 0x00)
+	pk.Header.WriteHeader(&data)
 
-	return dataBuf
+	return data
 }

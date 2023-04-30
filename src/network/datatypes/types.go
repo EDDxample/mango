@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"io"
+	"math"
 
 	"mango/src/nbt"
 )
@@ -114,6 +115,36 @@ func (vi *VarInt) Bytes() (buffer []byte) {
 	return
 }
 
+type Float float32 // =====================================================
+
+func (f *Float) ReadFrom(reader io.Reader) (n int64, err error) {
+	var bits uint32
+	err = binary.Read(reader, binary.BigEndian, &bits)
+	*f = Float(math.Float32frombits(bits))
+	return
+}
+
+func (f *Float) Bytes() (buffer []byte) {
+	buffer = make([]byte, 4)
+	binary.BigEndian.PutUint32(buffer, math.Float32bits(float32(*f)))
+	return buffer
+}
+
+type Double float64 // =====================================================
+
+func (d *Double) ReadFrom(reader io.Reader) (n int64, err error) {
+	var bits uint64
+	err = binary.Read(reader, binary.BigEndian, &bits)
+	*d = Double(math.Float64frombits(bits))
+	return
+}
+
+func (d *Double) Bytes() (buffer []byte) {
+	buffer = make([]byte, 4)
+	binary.BigEndian.PutUint64(buffer, math.Float64bits(float64(*d)))
+	return buffer
+}
+
 type Long int64 // =====================================================
 
 func (l *Long) ReadFrom(reader io.Reader) (n int64, err error) {
@@ -127,7 +158,7 @@ func (l *Long) Bytes() (buffer []byte) {
 	return buffer
 }
 
-type Boolean bool
+type Boolean bool // =====================================================
 
 func (b *Boolean) ReadFrom(reader io.Reader) (n int64, err error) {
 	val, err := ReadByte(reader)
@@ -146,7 +177,7 @@ func (b *Boolean) Bytes() (buffer []byte) {
 	return buffer
 }
 
-type Byte byte
+type Byte byte // =====================================================
 
 func (b *Byte) ReadFrom(reader io.Reader) (n int64, err error) {
 	val, err := ReadByte(reader)
@@ -161,7 +192,7 @@ func (b *Byte) Bytes() (buffer []byte) {
 	return buffer
 }
 
-type UByte uint8
+type UByte uint8 // =====================================================
 
 func (b *UByte) ReadFrom(reader io.Reader) (n int64, err error) {
 	val, err := ReadByte(reader)
@@ -176,7 +207,7 @@ func (b *UByte) Bytes() (buffer []byte) {
 	return buffer
 }
 
-type NbtCompound nbt.NBTTag // Should have NBTType as a compound
+type NbtCompound nbt.NBTTag // Should have NBTType as a compound ========
 
 func (nc *NbtCompound) ReadFrom(reader io.Reader) (n int64, err error) {
 	// TODO
@@ -186,4 +217,28 @@ func (nc *NbtCompound) ReadFrom(reader io.Reader) (n int64, err error) {
 func (nc *NbtCompound) Bytes() (buffer []byte) {
 	buffer = nbt.Marshal(nbt.NBTTag(*nc))
 	return
+}
+
+type Position struct{ x, y, z int } // =====================================================
+
+func (p *Position) ReadFrom(reader io.Reader) (n int64, err error) {
+	var value uint64
+	err = binary.Read(reader, binary.BigEndian, &value)
+
+	p.x = int((value >> 38) & 0x3FFFFFF)
+	p.z = int((value >> 12) & 0x3FFFFFF)
+	p.y = int(value & 0xFFF)
+
+	return
+}
+
+func (p *Position) Bytes() (buffer []byte) {
+	var value uint64
+	value |= (uint64(p.x) & 0x3FFFFFF) << 38 // x = 26 MSBs
+	value |= (uint64(p.z) & 0x3FFFFFF) << 12 // z = 26 middle bits
+	value |= uint64(p.y) & 0xFFF             // y = 12 LSBs
+
+	buffer = make([]byte, 8)
+	binary.BigEndian.PutUint64(buffer, value)
+	return buffer
 }
