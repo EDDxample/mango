@@ -17,3 +17,7 @@ Minecraft Advanced Network in go (Minecraft Server)
 
 ## Resources
 MC Protocol: https://wiki.vg/Protocol
+
+
+## Misleading Client Side Bugs
+- [Sometimes the status requests ignore the response packet and stay at "Pinging..."](https://bugs.mojang.com/browse/MC-125762)
