@@ -16,6 +16,7 @@ func HandleHandshakePacket(conn *Connection, data *[]byte) {
 	var handshake c2s.Handshake
 	handshake.ReadPacket(reader)
 	conn.state = ConnectionState(handshake.NextState)
+	logger.Info("Handshake, next state -> %d", handshake.NextState)
 }
 
 func HandleStatusPacket(conn *Connection, data *[]byte) {
@@ -83,15 +84,14 @@ func HandleLoginPacket(conn *Connection, data *[]byte) {
 			// send init PLAY packets (Login (Play) + Set Default Spawn Position)
 
 			var loginPlay s2c.LoginPlay
-			loginPlay.Header.PacketID = 0x28 // 0x28 on protocol 762
+			loginPlay.Header.PacketID = 0x28
 			packetBytes2 := loginPlay.Bytes()
 			conn.outgoingPackets <- &packetBytes2
 
 			var spawnPos s2c.SetDefaultSpawnPosition
-			spawnPos.Header.PacketID = 0x50 // 0x50 on protocol 762
+			spawnPos.Header.PacketID = 0x50
 			packetBytes3 := spawnPos.Bytes()
 			conn.outgoingPackets <- &packetBytes3
-			logger.Debug("Spawn Pos: %+v", spawnPos)
 		}
 	}
 }

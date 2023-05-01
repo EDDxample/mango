@@ -14,6 +14,36 @@ func ReadByte(reader io.Reader) (value byte, err error) {
 	return
 }
 
+type Byte byte // =====================================================
+
+func (b *Byte) ReadFrom(reader io.Reader) (n int64, err error) {
+	val, err := ReadByte(reader)
+	*b = Byte(val)
+	return
+}
+
+func (b *Byte) Bytes() (buffer []byte) {
+	buffer = make([]byte, 1)
+	buffer[0] = byte(*b)
+
+	return buffer
+}
+
+type UByte uint8 // =====================================================
+
+func (b *UByte) ReadFrom(reader io.Reader) (n int64, err error) {
+	val, err := ReadByte(reader)
+	*b = UByte(val)
+	return
+}
+
+func (b *UByte) Bytes() (buffer []byte) {
+	buffer = make([]byte, 1)
+	buffer[0] = byte(*b)
+
+	return buffer
+}
+
 type Short int16 // ======================================================
 
 func (s *Short) ReadFrom(reader io.Reader) (n int64, err error) {
@@ -22,7 +52,7 @@ func (s *Short) ReadFrom(reader io.Reader) (n int64, err error) {
 }
 
 func (s *Short) Bytes() (buffer []byte) {
-	buffer = make([]byte, 8)
+	buffer = make([]byte, 2)
 	binary.BigEndian.PutUint16(buffer, uint16(*s))
 	return buffer
 }
@@ -35,8 +65,34 @@ func (s *UShort) ReadFrom(reader io.Reader) (n int64, err error) {
 }
 
 func (s *UShort) Bytes() (buffer []byte) {
-	buffer = make([]byte, 8)
+	buffer = make([]byte, 2)
 	binary.BigEndian.PutUint16(buffer, uint16(*s))
+	return buffer
+}
+
+type Int int32 // ====================================================
+
+func (s *Int) ReadFrom(reader io.Reader) (n int64, err error) {
+	err = binary.Read(reader, binary.BigEndian, s)
+	return
+}
+
+func (s *Int) Bytes() (buffer []byte) {
+	buffer = make([]byte, 4)
+	binary.BigEndian.PutUint32(buffer, uint32(*s))
+	return buffer
+}
+
+type UInt uint32 // ====================================================
+
+func (i *UInt) ReadFrom(reader io.Reader) (n int64, err error) {
+	err = binary.Read(reader, binary.BigEndian, i)
+	return
+}
+
+func (i *UInt) Bytes() (buffer []byte) {
+	buffer = make([]byte, 4)
+	binary.BigEndian.PutUint32(buffer, uint32(*i))
 	return buffer
 }
 
@@ -140,7 +196,7 @@ func (d *Double) ReadFrom(reader io.Reader) (n int64, err error) {
 }
 
 func (d *Double) Bytes() (buffer []byte) {
-	buffer = make([]byte, 4)
+	buffer = make([]byte, 8)
 	binary.BigEndian.PutUint64(buffer, math.Float64bits(float64(*d)))
 	return buffer
 }
@@ -173,36 +229,6 @@ func (b *Boolean) Bytes() (buffer []byte) {
 	} else {
 		buffer[0] = 0
 	}
-
-	return buffer
-}
-
-type Byte byte // =====================================================
-
-func (b *Byte) ReadFrom(reader io.Reader) (n int64, err error) {
-	val, err := ReadByte(reader)
-	*b = Byte(val)
-	return
-}
-
-func (b *Byte) Bytes() (buffer []byte) {
-	buffer = make([]byte, 1)
-	buffer[0] = byte(*b)
-
-	return buffer
-}
-
-type UByte uint8 // =====================================================
-
-func (b *UByte) ReadFrom(reader io.Reader) (n int64, err error) {
-	val, err := ReadByte(reader)
-	*b = UByte(val)
-	return
-}
-
-func (b *UByte) Bytes() (buffer []byte) {
-	buffer = make([]byte, 1)
-	buffer[0] = byte(*b)
 
 	return buffer
 }
