@@ -12,7 +12,7 @@ type SetDefaultSpawnPosition struct {
 }
 
 func (pk *SetDefaultSpawnPosition) Bytes() []byte {
-	pk.Header.PacketID = 0x51
+	pk.Header.PacketID = 0x50
 	var data []byte
 
 	data = append(data, pk.Location.Bytes()...)

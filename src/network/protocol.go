@@ -33,7 +33,6 @@ func HandleStatusPacket(conn *Connection, data *[]byte) {
 		statusRequest.ReadPacket(reader)
 
 		var statusResponse s2c.StatusResponse
-		statusResponse.Header.PacketID = 0
 		statusResponse.StatusData.Protocol = uint16(config.Protocol())
 
 		packetBytes := statusResponse.Bytes()
@@ -44,7 +43,6 @@ func HandleStatusPacket(conn *Connection, data *[]byte) {
 		ping.ReadPacket(reader)
 
 		var pong s2c.PingResponse
-		pong.Header.PacketID = 1
 		pong.Timestamp = ping.Timestamp
 
 		packetBytes := pong.Bytes()
@@ -70,7 +68,6 @@ func HandleLoginPacket(conn *Connection, data *[]byte) {
 
 		} else { // Offline mode, return LoginSuccess
 			var logingSuccess s2c.LoginSuccess
-			logingSuccess.Header.PacketID = 2
 			logingSuccess.Username = loginStart.Name
 			if loginStart.HasUUID {
 				logingSuccess.UUID = loginStart.UUID
@@ -84,12 +81,10 @@ func HandleLoginPacket(conn *Connection, data *[]byte) {
 			// send init PLAY packets (Login (Play) + Set Default Spawn Position)
 
 			var loginPlay s2c.LoginPlay
-			loginPlay.Header.PacketID = 0x28
 			packetBytes2 := loginPlay.Bytes()
 			conn.outgoingPackets <- &packetBytes2
 
 			var spawnPos s2c.SetDefaultSpawnPosition
-			spawnPos.Header.PacketID = 0x50
 			packetBytes3 := spawnPos.Bytes()
 			conn.outgoingPackets <- &packetBytes3
 		}

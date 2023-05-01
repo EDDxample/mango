@@ -11,6 +11,7 @@ type PingResponse struct {
 }
 
 func (pk *PingResponse) Bytes() []byte {
+	pk.Header.PacketID = 0x01
 	var data []byte
 	data = append(data, pk.Timestamp.Bytes()...)
 	pk.Header.WriteHeader(&data)

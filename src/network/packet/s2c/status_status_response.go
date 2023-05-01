@@ -20,6 +20,7 @@ func (pk *StatusResponse) getStatusPayload() string {
 }
 
 func (pk *StatusResponse) Bytes() []byte {
+	pk.Header.PacketID = 0x00
 	pk.JsonPayload = dt.String(pk.getStatusPayload())
 
 	var data []byte

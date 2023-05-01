@@ -12,7 +12,7 @@ type LoginSuccess struct {
 }
 
 func (pk *LoginSuccess) Bytes() []byte {
-	pk.Header.PacketID = 2
+	pk.Header.PacketID = 0x02
 	var data []byte
 
 	if pk.UUID != nil && len(pk.UUID) != 0 {
