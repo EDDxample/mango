@@ -3,6 +3,7 @@ server:
   port: 25565
   online: false
   motd: Powered by man.go
+  protocol: 762 # 1.19.4
 
 logger:
   level: DEBUG

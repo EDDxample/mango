@@ -5,13 +5,13 @@ import (
 	"mango/src/network/packet"
 )
 
-type SetDefaultStartPosition struct {
+type SetDefaultSpawnPosition struct {
 	Header   packet.PacketHeader
 	Location dt.Position
 	Angle    dt.Float
 }
 
-func (pk *SetDefaultStartPosition) Bytes() []byte {
+func (pk *SetDefaultSpawnPosition) Bytes() []byte {
 	pk.Header.PacketID = 0x51
 	var data []byte
 

@@ -1,10 +1,14 @@
 package s2c
 
 import (
+	"mango/src/logger"
 	dt "mango/src/network/datatypes"
+	"mango/src/network/packet"
+	"os"
 )
 
-type Play struct {
+type LoginPlay struct {
+	Header packet.PacketHeader
 	// EntityID dt.Int
 	IsHardcore          dt.Boolean
 	Gamemode            dt.UByte
@@ -27,6 +31,10 @@ type Play struct {
 	DeathLocation       dt.String // FIXME: Position
 }
 
-func Bytes() []byte {
-	return nil
+func (pk *LoginPlay) Bytes() []byte {
+	f, _ := os.Open("login_packet1.bin")
+	arr := make([]byte, 30000)
+	n, _ := f.Read(arr)
+	logger.Info("sending %d bytes", n)
+	return arr[:n]
 }

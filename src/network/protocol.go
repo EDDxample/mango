@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io"
 	"mango/src/config"
+	"mango/src/logger"
 	"mango/src/network/packet"
 	"mango/src/network/packet/c2s"
 	"mango/src/network/packet/s2c"
@@ -30,9 +31,9 @@ func HandleStatusPacket(conn *Connection, data *[]byte) {
 		var statusRequest c2s.StatusRequest
 		statusRequest.ReadPacket(reader)
 
-		var statusResponse s2c.Status
+		var statusResponse s2c.StatusResponse
 		statusResponse.Header.PacketID = 0
-		statusResponse.StatusData.Protocol = uint16(762) // conn.Protocol
+		statusResponse.StatusData.Protocol = uint16(config.Protocol())
 
 		packetBytes := statusResponse.Bytes()
 		conn.outgoingPackets <- &packetBytes
@@ -76,7 +77,21 @@ func HandleLoginPacket(conn *Connection, data *[]byte) {
 
 			packetBytes := logingSuccess.Bytes()
 			conn.outgoingPackets <- &packetBytes
+			logger.Debug("Login Success: %+v", logingSuccess)
 			conn.state = PLAY
+
+			// send init PLAY packets (Login (Play) + Set Default Spawn Position)
+
+			var loginPlay s2c.LoginPlay
+			loginPlay.Header.PacketID = 0x28 // 0x28 on protocol 762
+			packetBytes2 := loginPlay.Bytes()
+			conn.outgoingPackets <- &packetBytes2
+
+			var spawnPos s2c.SetDefaultSpawnPosition
+			spawnPos.Header.PacketID = 0x50 // 0x50 on protocol 762
+			packetBytes3 := spawnPos.Bytes()
+			conn.outgoingPackets <- &packetBytes3
+			logger.Debug("Spawn Pos: %+v", spawnPos)
 		}
 	}
 }
@@ -87,10 +102,10 @@ func HandlePlayPacket(conn *Connection, data *[]byte) {
 	var header packet.PacketHeader
 	header.ReadHeader(reader)
 
+	logger.Info("PLAY packet ID: %d", header.PacketID)
+
 	reader.Seek(0, io.SeekStart)
 
 	switch header.PacketID {
-	case 0x28: // Login (Play)
-	case 0x50: // SetDefaultSpawnPosition
 	}
 }
