@@ -1,183 +1,185 @@
-| id  | protocol  | packet                                    |
-| --- | --------- | ----------------------------------------- |
-| 0   | handshake | ClientIntentionPacket                     |
-| --- | --------- | ----------------------------------------  |
-| 0   | status    | ClientboundStatusResponsePacket           |
-| 1   | status    | ClientboundPongResponsePacket             |
-| --- | --------- | ----------------------------------------  |
-| 0   | status    | ServerboundStatusRequestPacket            |
-| 1   | status    | ServerboundPingRequestPacket              |
-| --- | --------- | ----------------------------------------  |
-| 0   | login     | ClientboundLoginDisconnectPacket          |
-| 1   | login     | ClientboundHelloPacket                    |
-| 2   | login     | ClientboundGameProfilePacket              |
-| 3   | login     | ClientboundLoginCompressionPacket         |
-| 4   | login     | ClientboundCustomQueryPacket              |
-| --- | --------- | ----------------------------------------  |
-| 0   | login     | ServerboundHelloPacket                    |
-| 1   | login     | ServerboundKeyPacket                      |
-| 2   | login     | ServerboundCustomQueryPacket              |
-| --- | --------- | ----------------------------------------  |
-| 0   | game      | BundleDelimiterPacket                     |
-| 1   | game      | ClientboundAddEntityPacket                |
-| 2   | game      | ClientboundAddExperienceOrbPacket         |
-| 3   | game      | ClientboundAddPlayerPacket                |
-| 4   | game      | ClientboundAnimatePacket                  |
-| 5   | game      | ClientboundAwardStatsPacket               |
-| 6   | game      | ClientboundBlockChangedAckPacket          |
-| 7   | game      | ClientboundBlockDestructionPacket         |
-| 8   | game      | ClientboundBlockEntityDataPacket          |
-| 9   | game      | ClientboundBlockEventPacket               |
-| 10  | game      | ClientboundBlockUpdatePacket              |
-| 11  | game      | ClientboundBossEventPacket                |
-| 12  | game      | ClientboundChangeDifficultyPacket         |
-| 13  | game      | ClientboundChunksBiomesPacket             |
-| 14  | game      | ClientboundClearTitlesPacket              |
-| 15  | game      | ClientboundCommandSuggestionsPacket       |
-| 16  | game      | ClientboundCommandsPacket                 |
-| 17  | game      | ClientboundContainerClosePacket           |
-| 18  | game      | ClientboundContainerSetContentPacket      |
-| 19  | game      | ClientboundContainerSetDataPacket         |
-| 20  | game      | ClientboundContainerSetSlotPacket         |
-| 21  | game      | ClientboundCooldownPacket                 |
-| 22  | game      | ClientboundCustomChatCompletionsPacket    |
-| 23  | game      | ClientboundCustomPayloadPacket            |
-| 24  | game      | ClientboundDamageEventPacket              |
-| 25  | game      | ClientboundDeleteChatPacket               |
-| 26  | game      | ClientboundDisconnectPacket               |
-| 27  | game      | ClientboundDisguisedChatPacket            |
-| 28  | game      | ClientboundEntityEventPacket              |
-| 29  | game      | ClientboundExplodePacket                  |
-| 30  | game      | ClientboundForgetLevelChunkPacket         |
-| 31  | game      | ClientboundGameEventPacket                |
-| 32  | game      | ClientboundHorseScreenOpenPacket          |
-| 33  | game      | ClientboundHurtAnimationPacket            |
-| 34  | game      | ClientboundInitializeBorderPacket         |
-| 35  | game      | ClientboundKeepAlivePacket                |
-| 36  | game      | ClientboundLevelChunkWithLightPacket      |
-| 37  | game      | ClientboundLevelEventPacket               |
-| 38  | game      | ClientboundLevelParticlesPacket           |
-| 39  | game      | ClientboundLightUpdatePacket              |
-| 40  | game      | ClientboundLoginPacket                    |
-| 41  | game      | ClientboundMapItemDataPacket              |
-| 42  | game      | ClientboundMerchantOffersPacket           |
-| 43  | game      | ClientboundMoveEntityPacket.Pos           |
-| 44  | game      | ClientboundMoveEntityPacket.PosRot        |
-| 45  | game      | ClientboundMoveEntityPacket.Rot           |
-| 46  | game      | ClientboundMoveVehiclePacket              |
-| 47  | game      | ClientboundOpenBookPacket                 |
-| 48  | game      | ClientboundOpenScreenPacket               |
-| 49  | game      | ClientboundOpenSignEditorPacket           |
-| 50  | game      | ClientboundPingPacket                     |
-| 51  | game      | ClientboundPlaceGhostRecipePacket         |
-| 52  | game      | ClientboundPlayerAbilitiesPacket          |
-| 53  | game      | ClientboundPlayerChatPacket               |
-| 54  | game      | ClientboundPlayerCombatEndPacket          |
-| 55  | game      | ClientboundPlayerCombatEnterPacket        |
-| 56  | game      | ClientboundPlayerCombatKillPacket         |
-| 57  | game      | ClientboundPlayerInfoRemovePacket         |
-| 58  | game      | ClientboundPlayerInfoUpdatePacket         |
-| 59  | game      | ClientboundPlayerLookAtPacket             |
-| 60  | game      | ClientboundPlayerPositionPacket           |
-| 61  | game      | ClientboundRecipePacket                   |
-| 62  | game      | ClientboundRemoveEntitiesPacket           |
-| 63  | game      | ClientboundRemoveMobEffectPacket          |
-| 64  | game      | ClientboundResourcePackPacket             |
-| 65  | game      | ClientboundRespawnPacket                  |
-| 66  | game      | ClientboundRotateHeadPacket               |
-| 67  | game      | ClientboundSectionBlocksUpdatePacket      |
-| 68  | game      | ClientboundSelectAdvancementsTabPacket    |
-| 69  | game      | ClientboundServerDataPacket               |
-| 70  | game      | ClientboundSetActionBarTextPacket         |
-| 71  | game      | ClientboundSetBorderCenterPacket          |
-| 72  | game      | ClientboundSetBorderLerpSizePacket        |
-| 73  | game      | ClientboundSetBorderSizePacket            |
-| 74  | game      | ClientboundSetBorderWarningDelayPacket    |
-| 75  | game      | ClientboundSetBorderWarningDistancePacket |
-| 76  | game      | ClientboundSetCameraPacket                |
-| 77  | game      | ClientboundSetCarriedItemPacket           |
-| 78  | game      | ClientboundSetChunkCacheCenterPacket      |
-| 79  | game      | ClientboundSetChunkCacheRadiusPacket      |
-| 80  | game      | ClientboundSetDefaultSpawnPositionPacket  |
-| 81  | game      | ClientboundSetDisplayObjectivePacket      |
-| 82  | game      | ClientboundSetEntityDataPacket            |
-| 83  | game      | ClientboundSetEntityLinkPacket            |
-| 84  | game      | ClientboundSetEntityMotionPacket          |
-| 85  | game      | ClientboundSetEquipmentPacket             |
-| 86  | game      | ClientboundSetExperiencePacket            |
-| 87  | game      | ClientboundSetHealthPacket                |
-| 88  | game      | ClientboundSetObjectivePacket             |
-| 89  | game      | ClientboundSetPassengersPacket            |
-| 90  | game      | ClientboundSetPlayerTeamPacket            |
-| 91  | game      | ClientboundSetScorePacket                 |
-| 92  | game      | ClientboundSetSimulationDistancePacket    |
-| 93  | game      | ClientboundSetSubtitleTextPacket          |
-| 94  | game      | ClientboundSetTimePacket                  |
-| 95  | game      | ClientboundSetTitleTextPacket             |
-| 96  | game      | ClientboundSetTitlesAnimationPacket       |
-| 97  | game      | ClientboundSoundEntityPacket              |
-| 98  | game      | ClientboundSoundPacket                    |
-| 99  | game      | ClientboundStopSoundPacket                |
-| 100 | game      | ClientboundSystemChatPacket               |
-| 101 | game      | ClientboundTabListPacket                  |
-| 102 | game      | ClientboundTagQueryPacket                 |
-| 103 | game      | ClientboundTakeItemEntityPacket           |
-| 104 | game      | ClientboundTeleportEntityPacket           |
-| 105 | game      | ClientboundUpdateAdvancementsPacket       |
-| 106 | game      | ClientboundUpdateAttributesPacket         |
-| 107 | game      | ClientboundUpdateEnabledFeaturesPacket    |
-| 108 | game      | ClientboundUpdateMobEffectPacket          |
-| 109 | game      | ClientboundUpdateRecipesPacket            |
-| 110 | game      | ClientboundUpdateTagsPacket               |
-| --- | --------- | ----------------------------------------  |
-| 0   | game      | ServerboundAcceptTeleportationPacket      |
-| 1   | game      | ServerboundBlockEntityTagQuery            |
-| 2   | game      | ServerboundChangeDifficultyPacket         |
-| 3   | game      | ServerboundChatAckPacket                  |
-| 4   | game      | ServerboundChatCommandPacket              |
-| 5   | game      | ServerboundChatPacket                     |
-| 6   | game      | ServerboundChatSessionUpdatePacket        |
-| 7   | game      | ServerboundClientCommandPacket            |
-| 8   | game      | ServerboundClientInformationPacket        |
-| 9   | game      | ServerboundCommandSuggestionPacket        |
-| 10  | game      | ServerboundContainerButtonClickPacket     |
-| 11  | game      | ServerboundContainerClickPacket           |
-| 12  | game      | ServerboundContainerClosePacket           |
-| 13  | game      | ServerboundCustomPayloadPacket            |
-| 14  | game      | ServerboundEditBookPacket                 |
-| 15  | game      | ServerboundEntityTagQuery                 |
-| 16  | game      | ServerboundInteractPacket                 |
-| 17  | game      | ServerboundJigsawGeneratePacket           |
-| 18  | game      | ServerboundKeepAlivePacket                |
-| 19  | game      | ServerboundLockDifficultyPacket           |
-| 20  | game      | ServerboundMovePlayerPacket.Pos           |
-| 21  | game      | ServerboundMovePlayerPacket.PosRot        |
-| 22  | game      | ServerboundMovePlayerPacket.Rot           |
-| 23  | game      | ServerboundMovePlayerPacket.StatusOnly    |
-| 24  | game      | ServerboundMoveVehiclePacket              |
-| 25  | game      | ServerboundPaddleBoatPacket               |
-| 26  | game      | ServerboundPickItemPacket                 |
-| 27  | game      | ServerboundPlaceRecipePacket              |
-| 28  | game      | ServerboundPlayerAbilitiesPacket          |
-| 29  | game      | ServerboundPlayerActionPacket             |
-| 30  | game      | ServerboundPlayerCommandPacket            |
-| 31  | game      | ServerboundPlayerInputPacket              |
-| 32  | game      | ServerboundPongPacket                     |
-| 33  | game      | ServerboundRecipeBookChangeSettingsPacket |
-| 34  | game      | ServerboundRecipeBookSeenRecipePacket     |
-| 35  | game      | ServerboundRenameItemPacket               |
-| 36  | game      | ServerboundResourcePackPacket             |
-| 37  | game      | ServerboundSeenAdvancementsPacket         |
-| 38  | game      | ServerboundSelectTradePacket              |
-| 39  | game      | ServerboundSetBeaconPacket                |
-| 40  | game      | ServerboundSetCarriedItemPacket           |
-| 41  | game      | ServerboundSetCommandBlockPacket          |
-| 42  | game      | ServerboundSetCommandMinecartPacket       |
-| 43  | game      | ServerboundSetCreativeModeSlotPacket      |
-| 44  | game      | ServerboundSetJigsawBlockPacket           |
-| 45  | game      | ServerboundSetStructureBlockPacket        |
-| 46  | game      | ServerboundSignUpdatePacket               |
-| 47  | game      | ServerboundSwingPacket                    |
-| 48  | game      | ServerboundTeleportToEntityPacket         |
-| 49  | game      | ServerboundUseItemOnPacket                |
-| 50  | game      | ServerboundUseItemPacket                  |
+## Protocol: 762 (Minecraft 1.19.4)
+
+| ID  | hexID | Protocol | Packet Name                               |
+| --- | ---- | --------- | ----------------------------------------- |
+| 0   | 0x00 | handshake | ClientIntentionPacket                     |
+| --- | ---- | --------- | ----------------------------------------  |
+| 0   | 0x00 | status    | ClientboundStatusResponsePacket           |
+| 1   | 0x01 | status    | ClientboundPongResponsePacket             |
+| --- | ---- | --------- | ----------------------------------------  |
+| 0   | 0x00 | status    | ServerboundStatusRequestPacket            |
+| 1   | 0x01 | status    | ServerboundPingRequestPacket              |
+| --- | ---- | --------- | ----------------------------------------  |
+| 0   | 0x00 | login     | ClientboundLoginDisconnectPacket          |
+| 1   | 0x01 | login     | ClientboundHelloPacket                    |
+| 2   | 0x02 | login     | ClientboundGameProfilePacket              |
+| 3   | 0x03 | login     | ClientboundLoginCompressionPacket         |
+| 4   | 0x04 | login     | ClientboundCustomQueryPacket              |
+| --- | ---- | --------- | ----------------------------------------  |
+| 0   | 0x00 | login     | ServerboundHelloPacket                    |
+| 1   | 0x01 | login     | ServerboundKeyPacket                      |
+| 2   | 0x02 | login     | ServerboundCustomQueryPacket              |
+| --- | ---- | --------- | ----------------------------------------  |
+| 0   | 0x00 | game      | BundleDelimiterPacket                     |
+| 1   | 0x01 | game      | ClientboundAddEntityPacket                |
+| 2   | 0x02 | game      | ClientboundAddExperienceOrbPacket         |
+| 3   | 0x03 | game      | ClientboundAddPlayerPacket                |
+| 4   | 0x04 | game      | ClientboundAnimatePacket                  |
+| 5   | 0x05 | game      | ClientboundAwardStatsPacket               |
+| 6   | 0x06 | game      | ClientboundBlockChangedAckPacket          |
+| 7   | 0x07 | game      | ClientboundBlockDestructionPacket         |
+| 8   | 0x08 | game      | ClientboundBlockEntityDataPacket          |
+| 9   | 0x09 | game      | ClientboundBlockEventPacket               |
+| 10  | 0x0A | game      | ClientboundBlockUpdatePacket              |
+| 11  | 0x0B | game      | ClientboundBossEventPacket                |
+| 12  | 0x0C | game      | ClientboundChangeDifficultyPacket         |
+| 13  | 0x0D | game      | ClientboundChunksBiomesPacket             |
+| 14  | 0x0E | game      | ClientboundClearTitlesPacket              |
+| 15  | 0x0F | game      | ClientboundCommandSuggestionsPacket       |
+| 16  | 0x10 | game      | ClientboundCommandsPacket                 |
+| 17  | 0x11 | game      | ClientboundContainerClosePacket           |
+| 18  | 0x12 | game      | ClientboundContainerSetContentPacket      |
+| 19  | 0x13 | game      | ClientboundContainerSetDataPacket         |
+| 20  | 0x14 | game      | ClientboundContainerSetSlotPacket         |
+| 21  | 0x15 | game      | ClientboundCooldownPacket                 |
+| 22  | 0x16 | game      | ClientboundCustomChatCompletionsPacket    |
+| 23  | 0x17 | game      | ClientboundCustomPayloadPacket            |
+| 24  | 0x18 | game      | ClientboundDamageEventPacket              |
+| 25  | 0x19 | game      | ClientboundDeleteChatPacket               |
+| 26  | 0x1A | game      | ClientboundDisconnectPacket               |
+| 27  | 0x1B | game      | ClientboundDisguisedChatPacket            |
+| 28  | 0x1C | game      | ClientboundEntityEventPacket              |
+| 29  | 0x1D | game      | ClientboundExplodePacket                  |
+| 30  | 0x1E | game      | ClientboundForgetLevelChunkPacket         |
+| 31  | 0x1F | game      | ClientboundGameEventPacket                |
+| 32  | 0x20 | game      | ClientboundHorseScreenOpenPacket          |
+| 33  | 0x21 | game      | ClientboundHurtAnimationPacket            |
+| 34  | 0x22 | game      | ClientboundInitializeBorderPacket         |
+| 35  | 0x23 | game      | ClientboundKeepAlivePacket                |
+| 36  | 0x24 | game      | ClientboundLevelChunkWithLightPacket      |
+| 37  | 0x25 | game      | ClientboundLevelEventPacket               |
+| 38  | 0x26 | game      | ClientboundLevelParticlesPacket           |
+| 39  | 0x27 | game      | ClientboundLightUpdatePacket              |
+| 40  | 0x28 | game      | ClientboundLoginPacket                    |
+| 41  | 0x29 | game      | ClientboundMapItemDataPacket              |
+| 42  | 0x2A | game      | ClientboundMerchantOffersPacket           |
+| 43  | 0x2B | game      | ClientboundMoveEntityPacket.Pos           |
+| 44  | 0x2C | game      | ClientboundMoveEntityPacket.PosRot        |
+| 45  | 0x2D | game      | ClientboundMoveEntityPacket.Rot           |
+| 46  | 0x2E | game      | ClientboundMoveVehiclePacket              |
+| 47  | 0x2F | game      | ClientboundOpenBookPacket                 |
+| 48  | 0x30 | game      | ClientboundOpenScreenPacket               |
+| 49  | 0x31 | game      | ClientboundOpenSignEditorPacket           |
+| 50  | 0x32 | game      | ClientboundPingPacket                     |
+| 51  | 0x33 | game      | ClientboundPlaceGhostRecipePacket         |
+| 52  | 0x34 | game      | ClientboundPlayerAbilitiesPacket          |
+| 53  | 0x35 | game      | ClientboundPlayerChatPacket               |
+| 54  | 0x36 | game      | ClientboundPlayerCombatEndPacket          |
+| 55  | 0x37 | game      | ClientboundPlayerCombatEnterPacket        |
+| 56  | 0x38 | game      | ClientboundPlayerCombatKillPacket         |
+| 57  | 0x39 | game      | ClientboundPlayerInfoRemovePacket         |
+| 58  | 0x3A | game      | ClientboundPlayerInfoUpdatePacket         |
+| 59  | 0x3B | game      | ClientboundPlayerLookAtPacket             |
+| 60  | 0x3C | game      | ClientboundPlayerPositionPacket           |
+| 61  | 0x3D | game      | ClientboundRecipePacket                   |
+| 62  | 0x3E | game      | ClientboundRemoveEntitiesPacket           |
+| 63  | 0x3F | game      | ClientboundRemoveMobEffectPacket          |
+| 64  | 0x40 | game      | ClientboundResourcePackPacket             |
+| 65  | 0x41 | game      | ClientboundRespawnPacket                  |
+| 66  | 0x42 | game      | ClientboundRotateHeadPacket               |
+| 67  | 0x43 | game      | ClientboundSectionBlocksUpdatePacket      |
+| 68  | 0x44 | game      | ClientboundSelectAdvancementsTabPacket    |
+| 69  | 0x45 | game      | ClientboundServerDataPacket               |
+| 70  | 0x46 | game      | ClientboundSetActionBarTextPacket         |
+| 71  | 0x47 | game      | ClientboundSetBorderCenterPacket          |
+| 72  | 0x48 | game      | ClientboundSetBorderLerpSizePacket        |
+| 73  | 0x49 | game      | ClientboundSetBorderSizePacket            |
+| 74  | 0x4A | game      | ClientboundSetBorderWarningDelayPacket    |
+| 75  | 0x4B | game      | ClientboundSetBorderWarningDistancePacket |
+| 76  | 0x4C | game      | ClientboundSetCameraPacket                |
+| 77  | 0x4D | game      | ClientboundSetCarriedItemPacket           |
+| 78  | 0x4E | game      | ClientboundSetChunkCacheCenterPacket      |
+| 79  | 0x4F | game      | ClientboundSetChunkCacheRadiusPacket      |
+| 80  | 0x50 | game      | ClientboundSetDefaultSpawnPositionPacket  |
+| 81  | 0x51 | game      | ClientboundSetDisplayObjectivePacket      |
+| 82  | 0x52 | game      | ClientboundSetEntityDataPacket            |
+| 83  | 0x53 | game      | ClientboundSetEntityLinkPacket            |
+| 84  | 0x54 | game      | ClientboundSetEntityMotionPacket          |
+| 85  | 0x55 | game      | ClientboundSetEquipmentPacket             |
+| 86  | 0x56 | game      | ClientboundSetExperiencePacket            |
+| 87  | 0x57 | game      | ClientboundSetHealthPacket                |
+| 88  | 0x58 | game      | ClientboundSetObjectivePacket             |
+| 89  | 0x59 | game      | ClientboundSetPassengersPacket            |
+| 90  | 0x5A | game      | ClientboundSetPlayerTeamPacket            |
+| 91  | 0x5B | game      | ClientboundSetScorePacket                 |
+| 92  | 0x5C | game      | ClientboundSetSimulationDistancePacket    |
+| 93  | 0x5D | game      | ClientboundSetSubtitleTextPacket          |
+| 94  | 0x5E | game      | ClientboundSetTimePacket                  |
+| 95  | 0x5F | game      | ClientboundSetTitleTextPacket             |
+| 96  | 0x60 | game      | ClientboundSetTitlesAnimationPacket       |
+| 97  | 0x61 | game      | ClientboundSoundEntityPacket              |
+| 98  | 0x62 | game      | ClientboundSoundPacket                    |
+| 99  | 0x63 | game      | ClientboundStopSoundPacket                |
+| 100 | 0x64 | game      | ClientboundSystemChatPacket               |
+| 101 | 0x65 | game      | ClientboundTabListPacket                  |
+| 102 | 0x66 | game      | ClientboundTagQueryPacket                 |
+| 103 | 0x67 | game      | ClientboundTakeItemEntityPacket           |
+| 104 | 0x68 | game      | ClientboundTeleportEntityPacket           |
+| 105 | 0x69 | game      | ClientboundUpdateAdvancementsPacket       |
+| 106 | 0x6A | game      | ClientboundUpdateAttributesPacket         |
+| 107 | 0x6B | game      | ClientboundUpdateEnabledFeaturesPacket    |
+| 108 | 0x6C | game      | ClientboundUpdateMobEffectPacket          |
+| 109 | 0x6D | game      | ClientboundUpdateRecipesPacket            |
+| 110 | 0x6E | game      | ClientboundUpdateTagsPacket               |
+| --- | ---- | --------- | ----------------------------------------  |
+| 0   | 0x00 | game      | ServerboundAcceptTeleportationPacket      |
+| 1   | 0x01 | game      | ServerboundBlockEntityTagQuery            |
+| 2   | 0x02 | game      | ServerboundChangeDifficultyPacket         |
+| 3   | 0x03 | game      | ServerboundChatAckPacket                  |
+| 4   | 0x04 | game      | ServerboundChatCommandPacket              |
+| 5   | 0x05 | game      | ServerboundChatPacket                     |
+| 6   | 0x06 | game      | ServerboundChatSessionUpdatePacket        |
+| 7   | 0x07 | game      | ServerboundClientCommandPacket            |
+| 8   | 0x08 | game      | ServerboundClientInformationPacket        |
+| 9   | 0x09 | game      | ServerboundCommandSuggestionPacket        |
+| 10  | 0x0A | game      | ServerboundContainerButtonClickPacket     |
+| 11  | 0x0B | game      | ServerboundContainerClickPacket           |
+| 12  | 0x0C | game      | ServerboundContainerClosePacket           |
+| 13  | 0x0D | game      | ServerboundCustomPayloadPacket            |
+| 14  | 0x0E | game      | ServerboundEditBookPacket                 |
+| 15  | 0x0F | game      | ServerboundEntityTagQuery                 |
+| 16  | 0x10 | game      | ServerboundInteractPacket                 |
+| 17  | 0x11 | game      | ServerboundJigsawGeneratePacket           |
+| 18  | 0x12 | game      | ServerboundKeepAlivePacket                |
+| 19  | 0x13 | game      | ServerboundLockDifficultyPacket           |
+| 20  | 0x14 | game      | ServerboundMovePlayerPacket.Pos           |
+| 21  | 0x15 | game      | ServerboundMovePlayerPacket.PosRot        |
+| 22  | 0x16 | game      | ServerboundMovePlayerPacket.Rot           |
+| 23  | 0x17 | game      | ServerboundMovePlayerPacket.StatusOnly    |
+| 24  | 0x18 | game      | ServerboundMoveVehiclePacket              |
+| 25  | 0x19 | game      | ServerboundPaddleBoatPacket               |
+| 26  | 0x1A | game      | ServerboundPickItemPacket                 |
+| 27  | 0x1B | game      | ServerboundPlaceRecipePacket              |
+| 28  | 0x1C | game      | ServerboundPlayerAbilitiesPacket          |
+| 29  | 0x1D | game      | ServerboundPlayerActionPacket             |
+| 30  | 0x1E | game      | ServerboundPlayerCommandPacket            |
+| 31  | 0x1F | game      | ServerboundPlayerInputPacket              |
+| 32  | 0x20 | game      | ServerboundPongPacket                     |
+| 33  | 0x21 | game      | ServerboundRecipeBookChangeSettingsPacket |
+| 34  | 0x22 | game      | ServerboundRecipeBookSeenRecipePacket     |
+| 35  | 0x23 | game      | ServerboundRenameItemPacket               |
+| 36  | 0x24 | game      | ServerboundResourcePackPacket             |
+| 37  | 0x25 | game      | ServerboundSeenAdvancementsPacket         |
+| 38  | 0x26 | game      | ServerboundSelectTradePacket              |
+| 39  | 0x27 | game      | ServerboundSetBeaconPacket                |
+| 40  | 0x28 | game      | ServerboundSetCarriedItemPacket           |
+| 41  | 0x29 | game      | ServerboundSetCommandBlockPacket          |
+| 42  | 0x2A | game      | ServerboundSetCommandMinecartPacket       |
+| 43  | 0x2B | game      | ServerboundSetCreativeModeSlotPacket      |
+| 44  | 0x2C | game      | ServerboundSetJigsawBlockPacket           |
+| 45  | 0x2D | game      | ServerboundSetStructureBlockPacket        |
+| 46  | 0x2E | game      | ServerboundSignUpdatePacket               |
+| 47  | 0x2F | game      | ServerboundSwingPacket                    |
+| 48  | 0x30 | game      | ServerboundTeleportToEntityPacket         |
+| 49  | 0x31 | game      | ServerboundUseItemOnPacket                |
+| 50  | 0x32 | game      | ServerboundUseItemPacket                  |
