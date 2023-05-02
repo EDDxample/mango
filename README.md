@@ -18,7 +18,7 @@ Minecraft Advanced Network in go (Minecraft Server)
 - [ ] Load Chunks
 - [ ] Tick Worlds
 - [ ] Multiplayer
-  - [ ] Propper player IDs
+  - [ ] Proper player IDs
   - [ ] Movement
   - [ ] Tab player list
 
