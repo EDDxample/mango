@@ -13,7 +13,14 @@ Minecraft Advanced Network in go (Minecraft Server)
 - [ ] Login protocol
   - [x] Offline
   - [ ] Online
-- [ ] Join game protocol
+- [x] Join game protocol
+- [ ] Keep Alive Packet
+- [ ] Load Chunks
+- [ ] Tick Worlds
+- [ ] Multiplayer
+  - [ ] Propper player IDs
+  - [ ] Movement
+  - [ ] Tab player list
 
 ## Resources
 MC Protocol: https://wiki.vg/Protocol
