@@ -245,24 +245,24 @@ func (nc *NbtCompound) Bytes() (buffer []byte) {
 	return
 }
 
-type Position struct{ x, y, z int } // =====================================================
+type Position struct{ X, Y, Z int } // =====================================================
 
 func (p *Position) ReadFrom(reader io.Reader) (n int64, err error) {
 	var value uint64
 	err = binary.Read(reader, binary.BigEndian, &value)
 
-	p.x = int((value >> 38) & 0x3FFFFFF)
-	p.z = int((value >> 12) & 0x3FFFFFF)
-	p.y = int(value & 0xFFF)
+	p.X = int((value >> 38) & 0x3FFFFFF)
+	p.Z = int((value >> 12) & 0x3FFFFFF)
+	p.Y = int(value & 0xFFF)
 
 	return
 }
 
 func (p *Position) Bytes() (buffer []byte) {
 	var value uint64
-	value |= (uint64(p.x) & 0x3FFFFFF) << 38 // x = 26 MSBs
-	value |= (uint64(p.z) & 0x3FFFFFF) << 12 // z = 26 middle bits
-	value |= uint64(p.y) & 0xFFF             // y = 12 LSBs
+	value |= (uint64(p.X) & 0x3FFFFFF) << 38 // x = 26 MSBs
+	value |= (uint64(p.Z) & 0x3FFFFFF) << 12 // z = 26 middle bits
+	value |= uint64(p.Y) & 0xFFF             // y = 12 LSBs
 
 	buffer = make([]byte, 8)
 	binary.BigEndian.PutUint64(buffer, value)
