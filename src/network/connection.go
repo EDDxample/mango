@@ -5,6 +5,7 @@ import (
 	"io"
 	"mango/src/logger"
 	dt "mango/src/network/datatypes"
+	"mango/src/network/packet/s2c"
 	"net"
 	"time"
 )
@@ -113,7 +114,18 @@ func (c *Connection) handleIncomingPackets() {
 
 // Consumes the `outgoingPackets` channel and sends the packets to the client
 func (c *Connection) handleOutgoingPackets() {
+	tenSeconds := time.Now().UTC().Add(10 * time.Second)
 	for c.running {
+
+		// send keepalive packets for PLAY connections every 10s
+		if now := time.Now().UTC(); c.state == PLAY && now.After(tenSeconds) {
+			tenSeconds = now.Add(10 * time.Second)
+
+			var keepAlivePacket s2c.KeepAlive
+			keepAlivePacket.KeepAliveID = dt.Long(now.UnixNano())
+			c.connection.Write(keepAlivePacket.Bytes())
+		}
+
 		select {
 		case packet := <-c.outgoingPackets:
 			logger.Debug("[S > %s] %+v", c.connection.RemoteAddr().String(), len(*packet))

@@ -14,8 +14,9 @@ Minecraft Advanced Network in go (Minecraft Server)
   - [x] Offline
   - [ ] Online
 - [x] Join game protocol
-- [ ] Keep Alive Packet
+- [x] Keep Alive Packet
 - [ ] Load Chunks
+  - [ ] Chunk Data and Update Light Packet
 - [ ] Tick Worlds
 - [ ] Multiplayer
   - [ ] Proper player IDs
