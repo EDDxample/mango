@@ -20,7 +20,7 @@ type IWorld interface {
 // =====================================
 
 type MinecraftServer struct {
-	connListener network.IConnectionListener
+	connListener *network.ConnectionListener
 	playerList   IPlayerList
 	running      bool
 	tickCount    int

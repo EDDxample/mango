@@ -17,7 +17,7 @@ const (
 type ServerPlayer struct {
 
 	// server related
-	connection   network.IConnection
+	connection   *network.Connection
 	server       IServer
 	disconnected bool
 

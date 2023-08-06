@@ -10,34 +10,25 @@ import (
 	"time"
 )
 
-type IConnection interface {
+type _IConnection interface {
 	Tick()
 	IsAlive() bool
 	Close()
 }
 
-type ConnectionState int
-
-const (
-	SHAKE ConnectionState = iota
-	STATUS
-	LOGIN
-	PLAY
-)
-
 type Connection struct {
 	connection      net.Conn
-	running         bool
-	state           ConnectionState
+	alive           bool
+	state           Protocol
 	incomingPackets chan *[]byte
 	outgoingPackets chan *[]byte
 }
 
-func NewConnection(connection net.Conn) IConnection {
+func NewConnection(connection net.Conn) *Connection {
 	instance := &Connection{
 		connection:      connection,
 		state:           SHAKE,
-		running:         true,
+		alive:           true,
 		incomingPackets: make(chan *[]byte, 10),
 		outgoingPackets: make(chan *[]byte, 10),
 	}
@@ -47,33 +38,23 @@ func NewConnection(connection net.Conn) IConnection {
 }
 
 func (c *Connection) Tick() {
-	if c.running {
-		for {
-			select {
-			case packet := <-c.incomingPackets:
-				switch c.state {
-				case SHAKE:
-					HandleHandshakePacket(c, packet)
-				case STATUS:
-					HandleStatusPacket(c, packet)
-				case LOGIN:
-					HandleLoginPacket(c, packet)
-				case PLAY:
-					HandlePlayPacket(c, packet)
-				}
-			default:
-				return
-			}
+	for c.alive {
+		select {
+		case packet := <-c.incomingPackets:
+			HandlePacket(c, packet)
+
+		default:
+			return
 		}
 	}
 }
 
 // Listens for client packets and puts them in the `incomingPackets` channel
 func (c *Connection) handleIncomingPackets() {
-	defer c.connection.Close()
+	defer c.Close()
 	var data []byte
 
-	for c.running {
+	for c.alive {
 
 		data = make([]byte, 1024*4)
 		c.setTimeout()
@@ -95,7 +76,7 @@ func (c *Connection) handleIncomingPackets() {
 			if err != nil || packetLength == 0 {
 				if err != nil {
 					logger.Info("Client disconnected: %s (Reason: %s)", c.connection.RemoteAddr(), err)
-					c.running = false
+					return
 				}
 				break
 			}
@@ -105,17 +86,16 @@ func (c *Connection) handleIncomingPackets() {
 			packetBytes := data[start:end]
 			start = end
 
-			logger.Debug("[S < %s] %d, %v", c.connection.RemoteAddr(), packetLength, packetBytes)
+			// logger.Debug("[S < %s] %d, %v", c.connection.RemoteAddr(), packetLength, packetBytes)
 			c.incomingPackets <- &packetBytes
 		}
 	}
-	c.running = false
 }
 
 // Consumes the `outgoingPackets` channel and sends the packets to the client
 func (c *Connection) handleOutgoingPackets() {
 	tenSeconds := time.Now().UTC().Add(10 * time.Second)
-	for c.running {
+	for c.alive {
 
 		// send keepalive packets for PLAY connections every 10s
 		if now := time.Now().UTC(); c.state == PLAY && now.After(tenSeconds) {
@@ -128,8 +108,9 @@ func (c *Connection) handleOutgoingPackets() {
 
 		select {
 		case packet := <-c.outgoingPackets:
-			logger.Debug("[S > %s] %+v", c.connection.RemoteAddr().String(), len(*packet))
+			// logger.Debug("[S > %s] %+v", c.connection.RemoteAddr().String(), len(*packet))
 			c.connection.Write(*packet)
+
 		default:
 			continue
 		}
@@ -145,11 +126,7 @@ func (c *Connection) setTimeout() {
 	}
 }
 
-func (c *Connection) IsAlive() bool {
-	return c.running
-
-}
-
 func (c *Connection) Close() {
-	c.running = false
+	c.alive = false
+	c.connection.Close()
 }

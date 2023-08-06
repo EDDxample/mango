@@ -6,17 +6,17 @@ import (
 	"sync"
 )
 
-type IConnectionListener interface {
+type _IConnectionListener interface {
 	Start(host string, port int) error
 	Tick()
 }
 
 type ConnectionListener struct {
-	connections []IConnection
+	connections []*Connection
 	lock        sync.RWMutex
 }
 
-func NewConnectionListener() IConnectionListener {
+func NewConnectionListener() *ConnectionListener {
 	return &ConnectionListener{}
 }
 
@@ -51,7 +51,7 @@ func (listener *ConnectionListener) Tick() {
 
 	i := 0
 	for _, connection := range listener.connections {
-		if connection.IsAlive() {
+		if connection.alive {
 			connection.Tick()
 
 			// move alive connections to the front
