@@ -1,7 +1,7 @@
 package s2c
 
 import (
-	"io/ioutil"
+	"io"
 	dt "mango/src/network/datatypes"
 	"mango/src/network/packet"
 	"os"
@@ -38,7 +38,7 @@ func (pk *LoginPlay) Bytes() []byte {
 // loads the full packet bytes
 func (pk LoginPlay) getStoredPacketBytes() []byte {
 	f, err := os.Open("assets/fullLoginPacket.bin")
-	arr, err := ioutil.ReadAll(f)
+	arr, err := io.ReadAll(f)
 	if err != nil {
 		panic(err)
 	}
@@ -50,7 +50,7 @@ func (pk LoginPlay) getStoredPacketBytes() []byte {
 // Loads only the registryCodec bytes
 func (pk LoginPlay) getStoredRegistryBytes() []byte {
 	f, err := os.Open("assets/registryCodec.bin")
-	arr, err := ioutil.ReadAll(f)
+	arr, err := io.ReadAll(f)
 	if err != nil {
 		panic(err)
 	}

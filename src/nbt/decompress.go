@@ -3,7 +3,7 @@ package nbt
 import (
 	"bytes"
 	"compress/gzip"
-	"io/ioutil"
+	"io"
 	"os"
 )
 
@@ -42,7 +42,7 @@ func decompressGzip(file []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	data, err := ioutil.ReadAll(gzipr)
+	data, err := io.ReadAll(gzipr)
 	if err != nil {
 		return nil, err
 	}
