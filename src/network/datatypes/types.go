@@ -266,5 +266,23 @@ func (p *Position) Bytes() (buffer []byte) {
 
 	buffer = make([]byte, 8)
 	binary.BigEndian.PutUint64(buffer, value)
-	return buffer
+	return
+}
+
+// =====================================================
+type BitSet struct {
+	Data []Long
+}
+
+func (bs *BitSet) Bytes() (buffer []byte) {
+	length := VarInt(len(bs.Data))
+	buffer = append(buffer, length.Bytes()...)
+
+	data := make([]byte, 0, len(bs.Data)*8)
+	for _, l := range bs.Data {
+		data = append(data, l.Bytes()...)
+	}
+
+	buffer = append(buffer, data...)
+	return
 }

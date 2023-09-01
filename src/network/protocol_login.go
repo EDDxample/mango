@@ -5,6 +5,7 @@ import (
 	"io"
 	"mango/src/config"
 	"mango/src/logger"
+	dt "mango/src/network/datatypes"
 	"mango/src/network/packet"
 	"mango/src/network/packet/c2s"
 	"mango/src/network/packet/s2c"
@@ -38,7 +39,7 @@ func HandleLoginPacket(conn *Connection, data *[]byte) {
 			logger.Debug("Login Success: %+v", logingSuccess)
 			conn.state = PLAY
 
-			// send init PLAY packets (Login (Play) + Set Default Spawn Position)
+			// send init PLAY packets (Login (Play), Default Spawn Position, etc.)
 			onSuccessfulLogin(conn)
 		}
 	}
@@ -52,5 +53,16 @@ func onSuccessfulLogin(conn *Connection) {
 	var spawnPos s2c.SetDefaultSpawnPosition
 	packetBytes1 := spawnPos.Bytes()
 	conn.outgoingPackets <- &packetBytes1
+
+	// send 7X7 chunk square
+	for i := -3; i < 4; i++ {
+		for j := -3; j < 4; j++ {
+			var chunkPacket s2c.ChunkDataAndLight
+			chunkPacket.ChunkX = dt.Int(i)
+			chunkPacket.ChunkZ = dt.Int(j)
+			packetBytes2 := chunkPacket.Bytes()
+			conn.outgoingPackets <- &packetBytes2
+		}
+	}
 
 }

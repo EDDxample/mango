@@ -18,6 +18,10 @@ func NBTInt(n int32) nbt.NBTTag {
 	return nbt.NBTTag{NBTType: nbt.TAG_INT, NBTPayload: nbt.NBTPayloadUnion{S32: n}}
 }
 
+func NBTLongArray(arr []int64) nbt.NBTTag {
+	return nbt.NBTTag{NBTType: nbt.TAG_LONG_ARRAY, NBTPayload: nbt.NBTPayloadUnion{LongArray: arr}}
+}
+
 func NBTFloat(n float32) nbt.NBTTag {
 	return nbt.NBTTag{NBTType: nbt.TAG_FLOAT, NBTPayload: nbt.NBTPayloadUnion{F32: n}}
 }
