@@ -1,9 +1,12 @@
 # mango
 Minecraft Advanced Network in go (Minecraft Server) 
 
-![banner](assets/img.png)
+![banner](docs/assets/banner.png)
 
 `$ go run man.go`
+
+## Documentation
+Check out the [docs](docs) for a quick overview.
 
 ## TODO
 - [x] Project refactor
@@ -23,10 +26,6 @@ Minecraft Advanced Network in go (Minecraft Server)
   - [ ] Proper player IDs
   - [ ] Movement
   - [ ] Tab player list
-
-## Resources
-MC Protocol: https://wiki.vg/Protocol
-
 
 ## Misleading Client Side Bugs
 - [Sometimes the status requests ignore the response packet and stay at "Pinging..."](https://bugs.mojang.com/browse/MC-125762)
