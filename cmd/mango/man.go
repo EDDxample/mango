@@ -12,7 +12,8 @@ import (
 )
 
 var (
-	configPath = flag.String("c", "config.yml", "-c /path/to/config_file.yml")
+	configPath   = flag.String("c", "config.yml", "-c /path/to/config_file.yml")
+	profilerPort = flag.Int("p", 0, "-p <profiler port>")
 )
 
 func main() {
@@ -20,7 +21,7 @@ func main() {
 	config.Parse(*configPath)
 
 	// profiler
-	if config.ProfilerPort() != 0 {
+	if *profilerPort != 0 {
 		go runProfiler()
 	}
 
@@ -29,7 +30,6 @@ func main() {
 }
 
 func runProfiler() {
-	port := config.ProfilerPort()
-	logger.Info("Profiling server runing on 127.0.0.1:%d...", port)
-	logger.Info(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
+	logger.Info("Profiling server runing on 127.0.0.1:%d...", *profilerPort)
+	logger.Info(http.ListenAndServe(fmt.Sprintf(":%d", *profilerPort), nil))
 }

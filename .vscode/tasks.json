@@ -1,0 +1,83 @@
+{
+    "version": "2.0.0",
+    "type": "shell",
+    "tasks": [
+        {
+            "label": "Mango: build",
+            "type": "shell",
+            "command": "go",
+            "args": [
+                "build",
+                "-o",
+                "out/mango",
+                "./cmd/mango"
+            ],
+            "problemMatcher": [],
+            "windows": {
+                "args": [
+                    "build",
+                    "-o",
+                    "out/mango.exe",
+                    "./cmd/mango"
+                ]
+            }
+        },
+        {
+            "label": "Mango: run",
+            "type": "shell",
+            "command": "out/mango",
+            "problemMatcher": [],
+            "dependsOn": [
+                "Mango: build"
+            ]
+        },
+        {
+            "label": "Mango: run w/ profiler",
+            "type": "shell",
+            "command": "out/mango",
+            "args": [
+                "-p",
+                "${input:profilerPort}"
+            ],
+            "problemMatcher": [],
+            "dependsOn": [
+                "Mango: build"
+            ]
+        },
+        {
+            "label": "Pprof: read profiler",
+            "type": "shell",
+            "command": "go",
+            "args": [
+                "tool",
+                "pprof",
+                "--http",
+                ":${input:pprofPort}",
+                "http://localhost:${input:profilerPort}/debug/pprof/profile?seconds=20"
+            ],
+            "problemMatcher": [],
+        },
+    ],
+    "inputs": [
+        {
+            "id": "profilerPort",
+            "description": "Profiler Port",
+            "default": "8081",
+            "type": "promptString",
+        },
+        {
+            "id": "pprofPort",
+            "description": "PProf Tool Port",
+            "default": "8082",
+            "type": "promptString",
+        },
+    ],
+    "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+    }
+}
