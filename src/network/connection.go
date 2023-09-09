@@ -1,8 +1,6 @@
 package network
 
 import (
-	"bytes"
-	"io"
 	"mango/src/logger"
 	dt "mango/src/network/datatypes"
 	"mango/src/network/packet/s2c"
@@ -51,45 +49,31 @@ func (c *Connection) Tick() {
 
 // Listens for client packets and puts them in the `incomingPackets` channel
 func (c *Connection) handleIncomingPackets() {
-	defer c.Close()
-	var data []byte
-
 	for c.alive {
-
-		data = make([]byte, 1024*4)
 		c.setTimeout()
-		size, err := c.connection.Read(data)
 
-		// handle initial read errors
-		if err != nil || size == 0 {
-			logger.Info("Client disconnected: %s (Reason: %s)", c.connection.RemoteAddr(), err)
+		var packetLength dt.VarInt
+		n, err := packetLength.ReadFrom(c.connection)
+		if err != nil || n == 0 || packetLength == 0 {
+			if err != nil {
+				logger.Info("Client disconnected: %s (Reason: %s)", c.connection.RemoteAddr(), err)
+			}
 			break
 		}
 
-		// split packets and push them into `incomingPackets`
-		reader := bytes.NewReader(data)
-		for start := 0; start < size; {
-			reader.Seek(int64(start), io.SeekStart)
-
-			var packetLength dt.VarInt
-			n, err := packetLength.ReadFrom(reader)
-			if err != nil || packetLength == 0 {
-				if err != nil {
-					logger.Info("Client disconnected: %s (Reason: %s)", c.connection.RemoteAddr(), err)
-					return
-				}
-				break
+		packetBytes := make([]byte, n+int64(packetLength))
+		br, err := c.connection.Read(packetBytes[n:])
+		if err != nil || br == 0 {
+			if err != nil {
+				logger.Info("Client disconnected: %s (Reason: %s)", c.connection.RemoteAddr(), err)
 			}
-
-			end := start + int(n) + int(packetLength)
-
-			packetBytes := data[start:end]
-			start = end
-
-			// logger.Debug("[S < %s] %d, %v", c.connection.RemoteAddr(), packetLength, packetBytes)
-			c.incomingPackets <- &packetBytes
+			break
 		}
+
+		copy(packetBytes[:n+1], packetLength.Bytes())
+		c.incomingPackets <- &packetBytes
 	}
+	c.Close()
 }
 
 // Consumes the `outgoingPackets` channel and sends the packets to the client
