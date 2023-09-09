@@ -7,3 +7,6 @@ server:
 
 logger:
   level: DEBUG
+
+profiler:
+  port: 8080

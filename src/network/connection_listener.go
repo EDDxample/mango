@@ -47,7 +47,6 @@ func (listener *ConnectionListener) Start(host string, port int) error {
 
 func (listener *ConnectionListener) Tick() {
 	listener.lock.RLock()
-	defer listener.lock.RUnlock()
 
 	i := 0
 	for _, connection := range listener.connections {
@@ -66,13 +65,16 @@ func (listener *ConnectionListener) Tick() {
 		listener.connections[j] = nil
 	}
 	listener.connections = listener.connections[:i]
+
+	listener.lock.RUnlock()
 }
 
 func (listener *ConnectionListener) addConnection(connection *net.TCPConn) {
 	listener.lock.Lock()
-	defer listener.lock.Unlock()
 
 	connection.SetNoDelay(true)
 	connection.SetKeepAlive(true)
 	listener.connections = append(listener.connections, NewConnection(connection))
+
+	listener.lock.Unlock()
 }
