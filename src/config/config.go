@@ -11,8 +11,9 @@ import (
 var gconfig GlobalConfig
 
 type GlobalConfig struct {
-	Server ServerConfig `yaml:"server"`
-	Logger LoggerConfig `yaml:"logger"`
+	Server   ServerConfig   `yaml:"server"`
+	Logger   LoggerConfig   `yaml:"logger"`
+	Profiler ProfilerConfig `yaml:"profiler"`
 }
 
 func Motd() string {
@@ -64,6 +65,14 @@ type ServerConfig struct {
 
 type LoggerConfig struct {
 	Level string `yaml:"level"`
+}
+
+type ProfilerConfig struct {
+	Port int `yaml:"port"`
+}
+
+func ProfilerPort() int {
+	return gconfig.Profiler.Port
 }
 
 type LoggerLevel int

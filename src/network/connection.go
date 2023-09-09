@@ -94,27 +94,23 @@ func (c *Connection) handleIncomingPackets() {
 
 // Consumes the `outgoingPackets` channel and sends the packets to the client
 func (c *Connection) handleOutgoingPackets() {
-	tenSeconds := time.Now().UTC().Add(10 * time.Second)
+	keepAliveTicker := time.NewTicker(10 * time.Second)
+	var keepAlivePacket s2c.KeepAlive
+
 	for c.alive {
-
-		// send keepalive packets for PLAY connections every 10s
-		if now := time.Now().UTC(); c.state == PLAY && now.After(tenSeconds) {
-			tenSeconds = now.Add(10 * time.Second)
-
-			var keepAlivePacket s2c.KeepAlive
-			keepAlivePacket.KeepAliveID = dt.Long(now.UnixNano())
-			c.connection.Write(keepAlivePacket.Bytes())
-		}
-
 		select {
 		case packet := <-c.outgoingPackets:
-			// logger.Debug("[S > %s] %+v", c.connection.RemoteAddr().String(), len(*packet))
 			c.connection.Write(*packet)
 
-		default:
-			continue
+		case t := <-keepAliveTicker.C:
+			if c.state == PLAY {
+				keepAlivePacket.KeepAliveID = dt.Long(t.UTC().UnixNano())
+				c.connection.Write(keepAlivePacket.Bytes())
+			}
 		}
 	}
+
+	keepAliveTicker.Stop()
 }
 
 // Sets a different timeout depending on its current `state`
